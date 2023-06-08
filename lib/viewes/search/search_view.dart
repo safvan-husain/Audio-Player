@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../common/icon_box.dart';
+
 class SearchView extends StatelessWidget {
   const SearchView({super.key});
 
@@ -14,40 +16,18 @@ class SearchView extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              children: [
+              children: const [
                 Expanded(
                   child: Align(
                     alignment: Alignment.bottomLeft,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 109, 92, 161),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      width: 50,
-                      height: 50,
-                      child: const Icon(
-                        Icons.arrow_back_ios,
-                        color: Color.fromARGB(137, 210, 205, 205),
-                        size: 30,
-                      ),
-                    ),
+                    child: IconBox(icon: Icons.arrow_back_ios_new),
                   ),
                 ),
                 Expanded(
                   child: Align(
                     alignment: Alignment.bottomRight,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 109, 92, 161),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      width: 50,
-                      height: 50,
-                      child: const Icon(
-                        Icons.favorite_outline,
-                        color: Color.fromARGB(137, 210, 205, 205),
-                        size: 30,
-                      ),
+                    child: IconBox(
+                      icon: Icons.favorite_outline,
                     ),
                   ),
                 ),
@@ -59,6 +39,7 @@ class SearchView extends StatelessWidget {
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 25,
+                fontWeight: FontWeight.bold,
               ),
             )
           ],

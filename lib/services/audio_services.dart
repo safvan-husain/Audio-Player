@@ -27,4 +27,6 @@ class AudioServices {
     await audioPlayer.pause();
     log('pause invoked');
   }
+
+  AudioPlayer get player => audioPlayer;
 }

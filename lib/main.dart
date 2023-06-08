@@ -1,6 +1,6 @@
 import 'package:audio_player/provider/current_index_provider.dart';
 import 'package:audio_player/utils/bottom_nav_bar.dart';
-import 'package:audio_player/viewes/home/Home_view.dart';
+import 'package:audio_player/viewes/home/home_view.dart';
 import 'package:audio_player/viewes/search/search_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -38,16 +38,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final List<Widget> _pages = const [
+  final List<Widget> _pages = [
     HomeView(),
-    SearchView(),
-    Center(
+    const SearchView(),
+    const Center(
       child: Text('music'),
     ),
-    Center(
+    const Center(
       child: Text('account'),
     ),
-    Center(
+    const Center(
       child: Text('m'),
     ),
   ];

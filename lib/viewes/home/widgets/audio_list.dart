@@ -6,13 +6,21 @@ class AudioList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<String> audioPaths = [
+      'audios/aaro.mp3',
+      'audios/adam_john.mp3',
+      'audios/bgm.mp3',
+      // Add more audio file paths
+    ];
     return Expanded(
       child: ListView.separated(
           itemBuilder: (context, index) {
-            return AudioTale();
+            return AudioTale(
+              audioPath: audioPaths[index],
+            );
           },
           separatorBuilder: (context, index) => const Divider(),
-          itemCount: 10),
+          itemCount: audioPaths.length),
     );
   }
 }

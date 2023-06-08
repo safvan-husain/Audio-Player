@@ -1,3 +1,4 @@
+import 'package:audio_player/common/icon_box.dart';
 import 'package:audio_player/viewes/home/widgets/audio_list.dart';
 import 'package:audio_player/viewes/home/widgets/music_image.dart';
 import 'package:audio_player/viewes/home/widgets/selectable_textbox.dart';
@@ -12,85 +13,100 @@ class HomeView extends StatelessWidget {
       backgroundColor: const Color.fromARGB(255, 46, 36, 76),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.only(left: 20, right: 20, top: 40),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+          child: Stack(
             children: [
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 109, 92, 161),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      width: 100,
-                      height: 50,
-                      child: const Icon(Icons.paragliding_outlined),
+                  builtSearchBar(),
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Trending right now',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(
-                    width: 20,
+                    height: 10,
                   ),
-                  Expanded(
-                    flex: 5,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Color.fromARGB(255, 109, 92, 161),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      width: 100,
-                      height: 50,
-                      child: const TextField(
-                        decoration: InputDecoration(
-                            hintText: 'search',
-                            border: InputBorder.none,
-                            prefixIcon: Icon(Icons.search)),
-                      ),
-                    ),
-                  )
+                  builtCarouselMusic(),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const SelectableTextOptions(),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  const AudioList()
                 ],
               ),
-              const SizedBox(height: 20),
-              const Text(
-                'Trending right now',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    MusicImage(
-                      audioPath: 'audios/adam_john.mp3',
-                      name: 'Adam Joan',
-                    ),
-                    const SizedBox(width: 20),
-                    MusicImage(
-                      audioPath: 'audios/aaro.mp3',
-                      name: 'Aaro',
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(
-                height: 10,
-              ),
-              const SelectableTextOptions(),
-              const SizedBox(
-                height: 10,
-              ),
-              AudioList()
+              Positioned(
+                child: Container(),
+              )
             ],
           ),
         ),
       ),
+    );
+  }
+
+  SingleChildScrollView builtCarouselMusic() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          MusicImage(
+            audioPath: 'audios/adam_john.mp3',
+            name: 'Adam Joan',
+            image: 'assets/images/pop.jpeg',
+          ),
+          const SizedBox(width: 20),
+          MusicImage(
+            audioPath: 'audios/aaro.mp3',
+            name: 'Aaro',
+            image: 'assets/images/pop3.jpeg',
+          ),
+          const SizedBox(width: 20),
+          MusicImage(
+            audioPath: 'audios/bgm.mp3',
+            name: 'BGM',
+            image: 'assets/images/pop2.jpeg',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Row builtSearchBar() {
+    return Row(
+      children: [
+        const Expanded(
+          child: IconBox(icon: Icons.receipt),
+        ),
+        const SizedBox(
+          width: 20,
+        ),
+        Expanded(
+          flex: 5,
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 109, 92, 161),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            width: 100,
+            height: 50,
+            child: const TextField(
+              decoration: InputDecoration(
+                  hintText: 'search',
+                  border: InputBorder.none,
+                  prefixIcon: Icon(Icons.search)),
+            ),
+          ),
+        )
+      ],
     );
   }
 }

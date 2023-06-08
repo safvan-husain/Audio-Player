@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 class MusicImage extends StatefulWidget {
   final String audioPath;
   final String name;
+  final String image;
   final AudioServices player;
 
   MusicImage({
     Key? key,
     required this.audioPath,
     required this.name,
+    required this.image,
   })  : player = AudioServices(audioPath: audioPath),
         super(key: key);
 
@@ -27,10 +29,10 @@ class _MusicImageState extends State<MusicImage> {
         Container(
           height: 200,
           width: 250,
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(10)),
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(10)),
             image: DecorationImage(
-              image: AssetImage('assets/images/pop.jpeg'),
+              image: AssetImage(widget.image),
               fit: BoxFit.cover,
             ),
           ),
