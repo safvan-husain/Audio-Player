@@ -1,3 +1,4 @@
+import 'package:audio_player/viewes/home/widgets/audio_list.dart';
 import 'package:audio_player/viewes/home/widgets/music_image.dart';
 import 'package:audio_player/viewes/home/widgets/selectable_textbox.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,7 @@ class HomeView extends StatelessWidget {
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 106, 70, 212),
+                        color: const Color.fromARGB(255, 109, 92, 161),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       width: 100,
@@ -35,7 +36,7 @@ class HomeView extends StatelessWidget {
                     flex: 5,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 106, 70, 212),
+                        color: Color.fromARGB(255, 109, 92, 161),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       width: 100,
@@ -55,7 +56,7 @@ class HomeView extends StatelessWidget {
                 'Trending right now',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 35,
+                  fontSize: 25,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -73,7 +74,7 @@ class HomeView extends StatelessWidget {
                     const SizedBox(width: 20),
                     MusicImage(
                       audioPath: 'audios/aaro.mp3',
-                      name: 'Adam Joan',
+                      name: 'Aaro',
                     ),
                   ],
                 ),
@@ -81,7 +82,11 @@ class HomeView extends StatelessWidget {
               const SizedBox(
                 height: 10,
               ),
-              const SelectableTextOptions()
+              const SelectableTextOptions(),
+              const SizedBox(
+                height: 10,
+              ),
+              AudioList()
             ],
           ),
         ),

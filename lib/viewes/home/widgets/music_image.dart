@@ -46,7 +46,7 @@ class _MusicImageState extends State<MusicImage> {
           child: Container(
             decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(10)),
-              color: Colors.black,
+              color: Color.fromARGB(255, 43, 67, 176),
             ),
             height: 80,
             width: 100,
@@ -108,7 +108,7 @@ class _MusicImageState extends State<MusicImage> {
                     },
                     child: Icon(
                       isPlaying ? Icons.pause : Icons.play_arrow_rounded,
-                      color: Colors.blue,
+                      color: Colors.black,
                       size: 30,
                     ),
                   ),
