@@ -7,6 +7,7 @@ This is a simple audio player built with Flutter that allows you to play multipl
 - Play multiple audio files simultaneously
 - Pause and resume audio playback
 - Display the duration and current position of each audio file
+- add to favourites and listen
 
 ## Installation
 
