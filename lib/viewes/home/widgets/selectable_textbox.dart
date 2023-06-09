@@ -31,7 +31,10 @@ class _SelectableTextOptionsState extends State<SelectableTextOptions> {
             return ChoiceChip(
               label: Text(
                 options[index],
-                style: const TextStyle(color: Colors.white),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                ),
               ),
               selected: selectedIndex == index,
               shape: RoundedRectangleBorder(

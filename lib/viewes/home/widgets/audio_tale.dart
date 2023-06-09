@@ -52,7 +52,7 @@ class _AudioTaleState extends State<AudioTale> {
                   Text(
                     extractFileName(widget.audioPath),
                     style: const TextStyle(
-                      fontSize: 20,
+                      fontSize: 15,
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),

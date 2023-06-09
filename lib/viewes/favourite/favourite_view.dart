@@ -24,7 +24,7 @@ class FavouriteView extends StatelessWidget {
               'Recent favourites',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 25,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -38,7 +38,7 @@ class FavouriteView extends StatelessWidget {
                 child: Text(
                   "You have no favourites",
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 15,
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),

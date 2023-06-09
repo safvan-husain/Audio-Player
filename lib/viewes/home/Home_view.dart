@@ -25,7 +25,7 @@ class HomeView extends StatelessWidget {
                     'Trending right now',
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: 22,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
