@@ -1,6 +1,14 @@
+import 'dart:developer';
+
+import 'package:audio_player/provider/current_audio.dart';
+import 'package:audio_player/provider/current_index_provider.dart';
+import 'package:audio_player/services/audio_services.dart';
 import 'package:audio_player/utils/audio_name.dart';
 import 'package:audio_player/viewes/audio_view/audio_view.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../../provider/audio_player_provider.dart';
 
 class AudioTale extends StatefulWidget {
   final String audioPath;
@@ -15,14 +23,10 @@ class _AudioTaleState extends State<AudioTale> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AudioView(
-              image: 'assets/images/pop2.jpeg',
-              audioPath: widget.audioPath,
-            ),
-          ),
+        log(extractFileName(widget.audioPath));
+        Provider.of<AudioPlayerProvider>(context, listen: false).appenAudio(
+          extractFileName(widget.audioPath),
+          widget.audioPath,
         );
       },
       child: SizedBox(

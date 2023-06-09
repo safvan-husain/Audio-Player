@@ -1,13 +1,20 @@
+import 'package:audio_player/provider/audio_player_provider.dart';
+import 'package:audio_player/provider/current_audio.dart';
 import 'package:audio_player/provider/current_index_provider.dart';
 import 'package:audio_player/utils/bottom_nav_bar.dart';
 import 'package:audio_player/viewes/home/home_view.dart';
+import 'package:audio_player/viewes/home/widgets/progress_bar.dart';
 import 'package:audio_player/viewes/search/search_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() {
   runApp(MultiProvider(
-    providers: [ChangeNotifierProvider(create: (_) => CurrentIndexProvider())],
+    providers: [
+      ChangeNotifierProvider(create: (_) => CurrentIndexProvider()),
+      ChangeNotifierProvider(create: (_) => CurrentAudioProvider()),
+      ChangeNotifierProvider(create: (_) => AudioPlayerProvider()),
+    ],
     child: const MyApp(),
   ));
 }
@@ -39,7 +46,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<Widget> _pages = [
-    HomeView(),
+    const HomeView(),
     const SearchView(),
     const Center(
       child: Text('music'),
@@ -57,8 +64,21 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
         extendBody: true,
         backgroundColor: Colors.transparent,
-        body: _pages
-            .elementAt(context.watch<CurrentIndexProvider>().currentIndex),
+        body: Stack(
+          children: [
+            _pages
+                .elementAt(context.watch<CurrentIndexProvider>().currentIndex),
+            if (context.watch<AudioPlayerProvider>().isEmpty())
+              Positioned(
+                bottom: 80,
+                left: 1,
+                right: 1,
+                child: AudioControl(
+                  audioPath: context.watch<CurrentAudioProvider>().audioPath,
+                ),
+              )
+          ],
+        ),
         bottomNavigationBar: const BottomNav());
   }
 }
