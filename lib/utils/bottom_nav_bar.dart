@@ -37,7 +37,7 @@ class _BottomNavState extends State<BottomNav> {
               icon: const Icon(Icons.home_outlined),
             ),
             CustomNavigationBarItem(
-              icon: const Icon(Icons.search_outlined),
+              icon: const Icon(Icons.favorite_outline),
             ),
             CustomNavigationBarItem(
               icon: const Icon(Icons.music_note_outlined),

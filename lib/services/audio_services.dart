@@ -29,5 +29,14 @@ class AudioServices {
     await audioPlayer.stop();
   }
 
+  bool isPlaying() {
+    PlayerState current = PlayerState.paused;
+    audioPlayer.onPlayerStateChanged.listen((PlayerState s) {
+      current = s;
+    });
+    if (current == PlayerState.playing) return true;
+    return false;
+  }
+
   AudioPlayer get player => audioPlayer;
 }

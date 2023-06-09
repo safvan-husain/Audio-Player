@@ -1,11 +1,8 @@
 import 'package:audio_player/common/icon_box.dart';
-import 'package:audio_player/provider/current_audio.dart';
 import 'package:audio_player/viewes/home/widgets/audio_list.dart';
 import 'package:audio_player/viewes/home/widgets/music_image.dart';
-import 'package:audio_player/viewes/home/widgets/progress_bar.dart';
 import 'package:audio_player/viewes/home/widgets/selectable_textbox.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});

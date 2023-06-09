@@ -1,12 +1,10 @@
-import 'dart:developer';
-
 import 'package:audio_player/provider/audio_player_provider.dart';
-import 'package:audio_player/provider/current_audio.dart';
 import 'package:audio_player/provider/current_index_provider.dart';
+import 'package:audio_player/provider/faviourate_audio_provider.dart';
 import 'package:audio_player/utils/bottom_nav_bar.dart';
 import 'package:audio_player/viewes/home/home_view.dart';
-import 'package:audio_player/viewes/home/widgets/progress_bar.dart';
-import 'package:audio_player/viewes/search/search_view.dart';
+import 'package:audio_player/viewes/home/widgets/audio_controll.dart';
+import 'package:audio_player/viewes/favourite/favourite_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,7 +12,7 @@ void main() {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => CurrentIndexProvider()),
-      ChangeNotifierProvider(create: (_) => CurrentAudioProvider()),
+      ChangeNotifierProvider(create: (_) => FavouriteAudioProvider()),
       ChangeNotifierProvider(create: (_) => AudioPlayerProvider()),
     ],
     child: const MyApp(),
@@ -49,7 +47,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final List<Widget> _pages = [
     const HomeView(),
-    const SearchView(),
+    const FavouriteView(),
     const Center(
       child: Text('music'),
     ),
@@ -78,7 +76,6 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Positioned audios(BuildContext context) {
-    log(context.watch<AudioPlayerProvider>().length().toString());
     return Positioned(
       bottom: 80,
       left: 1,

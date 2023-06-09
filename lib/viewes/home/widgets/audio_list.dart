@@ -14,13 +14,14 @@ class AudioList extends StatelessWidget {
     ];
     return Expanded(
       child: ListView.separated(
-          itemBuilder: (context, index) {
-            return AudioTale(
-              audioPath: audioPaths[index],
-            );
-          },
-          separatorBuilder: (context, index) => const Divider(),
-          itemCount: audioPaths.length),
+        itemBuilder: (context, index) {
+          return AudioTale(
+            audioPath: audioPaths[index],
+          );
+        },
+        separatorBuilder: (context, index) => const Divider(),
+        itemCount: audioPaths.length,
+      ),
     );
   }
 }

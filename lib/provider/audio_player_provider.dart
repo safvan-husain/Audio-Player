@@ -1,3 +1,4 @@
+import 'package:audio_player/utils/audio_name.dart';
 import 'package:flutter/material.dart';
 
 import '../services/audio_services.dart';
@@ -9,10 +10,11 @@ class AudioPlayerProvider extends ChangeNotifier {
     return audioPlayer.length;
   }
 
-  void appenAudio(String name, AudioServices audio) {
-    audio.play();
+  void appenAudio(String audioPath) {
+    String name = extractFileName(audioPath);
     if (!audioPlayer.containsKey(name)) {
-      audioPlayer[name] = AudioServices(audioPath: "/audio/$name.mp3");
+      audioPlayer[name] = AudioServices(audioPath: audioPath);
+      if (audioPlayer[name] != null) audioPlayer[name]!.play();
       notifyListeners();
     }
   }
@@ -27,7 +29,6 @@ class AudioPlayerProvider extends ChangeNotifier {
   void stopAudio(String name) {
     if (audioPlayer.containsKey(name)) {
       audioPlayer[name]!.stop();
-      // audioPlayer[name]!.player.dispose();
       audioPlayer.remove(name);
       notifyListeners();
     }

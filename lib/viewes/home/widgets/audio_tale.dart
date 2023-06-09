@@ -1,10 +1,6 @@
-import 'dart:developer';
-
-import 'package:audio_player/provider/current_audio.dart';
-import 'package:audio_player/provider/current_index_provider.dart';
+import 'package:audio_player/provider/faviourate_audio_provider.dart';
 import 'package:audio_player/services/audio_services.dart';
 import 'package:audio_player/utils/audio_name.dart';
-import 'package:audio_player/viewes/audio_view/audio_view.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -26,12 +22,9 @@ class _AudioTaleState extends State<AudioTale> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        // AudioServices audio = AudioServices(audioPath: widget.audioPath);
-        log(extractFileName(widget.audioPath));
-        Provider.of<AudioPlayerProvider>(context, listen: false).appenAudio(
-          extractFileName(widget.audioPath),
-          widget.audio,
-        );
+        //adding to the playing List
+        Provider.of<AudioPlayerProvider>(context, listen: false)
+            .appenAudio(widget.audioPath);
       },
       child: SizedBox(
         width: double.infinity,
@@ -74,8 +67,26 @@ class _AudioTaleState extends State<AudioTale> {
                 ],
               ),
             ),
-            const Icon(
-              Icons.favorite_outline,
+            InkWell(
+              onTap: () {
+                if (context
+                    .read<FavouriteAudioProvider>()
+                    .isFavourite(widget.audioPath)) {
+                  Provider.of<FavouriteAudioProvider>(context, listen: false)
+                      .removeFromFavourite(widget.audioPath);
+                } else {
+                  Provider.of<FavouriteAudioProvider>(context, listen: false)
+                      .addTOFavourite(widget.audioPath);
+                }
+              },
+              child: Icon(
+                context
+                        .watch<FavouriteAudioProvider>()
+                        .isFavourite(widget.audioPath)
+                    ? Icons.favorite_outlined
+                    : Icons.favorite_outline,
+                color: Colors.redAccent,
+              ),
             )
           ],
         ),
