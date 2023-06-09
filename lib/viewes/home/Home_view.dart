@@ -10,13 +10,16 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: const Color.fromARGB(255, 46, 36, 76),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
-          child: Stack(
-            children: [
-              Column(
+          child: SingleChildScrollView(
+            child: SizedBox(
+              height: MediaQuery.of(context).size.height,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   builtSearchBar(),
@@ -43,7 +46,7 @@ class HomeView extends StatelessWidget {
                   const AudioList()
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -107,3 +110,4 @@ class HomeView extends StatelessWidget {
     );
   }
 }
+
