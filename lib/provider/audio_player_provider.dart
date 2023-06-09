@@ -1,24 +1,20 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 
 import '../services/audio_services.dart';
 
 class AudioPlayerProvider extends ChangeNotifier {
   Map<String, AudioServices> audioPlayer = {};
-  bool isEmpty() {
-    if (audioPlayer.isEmpty) {
-      return false;
-    }
-    return true;
+
+  int length() {
+    return audioPlayer.length;
   }
 
-  void appenAudio(String name, String audioPath) {
-    log(audioPlayer.length.toString());
-    AudioServices audio = AudioServices(audioPath: audioPath);
+  void appenAudio(String name, AudioServices audio) {
     audio.play();
-    audioPlayer[name] = audio;
-    notifyListeners();
+    if (!audioPlayer.containsKey(name)) {
+      audioPlayer[name] = AudioServices(audioPath: "/audio/$name.mp3");
+      notifyListeners();
+    }
   }
 
   AudioServices? getAudio(String name) {
@@ -31,6 +27,7 @@ class AudioPlayerProvider extends ChangeNotifier {
   void stopAudio(String name) {
     if (audioPlayer.containsKey(name)) {
       audioPlayer[name]!.stop();
+      // audioPlayer[name]!.player.dispose();
       audioPlayer.remove(name);
       notifyListeners();
     }

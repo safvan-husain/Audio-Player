@@ -35,7 +35,7 @@ class HomeView extends StatelessWidget {
                   const SizedBox(
                     height: 10,
                   ),
-                  // builtCarouselMusic(),
+                  builtCarouselMusic(),
                   const SizedBox(
                     height: 10,
                   ),

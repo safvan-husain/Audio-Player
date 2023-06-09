@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:audio_player/provider/audio_player_provider.dart';
 import 'package:audio_player/provider/current_audio.dart';
 import 'package:audio_player/provider/current_index_provider.dart';
@@ -68,17 +70,30 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             _pages
                 .elementAt(context.watch<CurrentIndexProvider>().currentIndex),
-            if (context.watch<AudioPlayerProvider>().isEmpty())
-              Positioned(
-                bottom: 80,
-                left: 1,
-                right: 1,
-                child: AudioControl(
-                  audioPath: context.watch<CurrentAudioProvider>().audioPath,
-                ),
-              )
+            if (context.watch<AudioPlayerProvider>().length() > 0)
+              audios(context)
           ],
         ),
         bottomNavigationBar: const BottomNav());
+  }
+
+  Positioned audios(BuildContext context) {
+    log(context.watch<AudioPlayerProvider>().length().toString());
+    return Positioned(
+      bottom: 80,
+      left: 1,
+      right: 1,
+      child: Column(
+        children: context
+            .watch<AudioPlayerProvider>()
+            .audioPlayer
+            .entries
+            .map((entry) => AudioControl(
+                  player: entry.value,
+                  audioPath: entry.key,
+                ))
+            .toList(),
+      ),
+    );
   }
 }

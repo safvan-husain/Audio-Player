@@ -1,5 +1,4 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:developer';
 
 import 'package:audioplayers/audioplayers.dart';
 
@@ -15,23 +14,19 @@ class AudioServices {
   final AudioPlayer audioPlayer = AudioPlayer();
 
   Future<void> _set() async {
-    log(audioPath);
     await audioPlayer.setSource(AssetSource(audioPath));
   }
 
   void play() async {
     await audioPlayer.resume();
-    log('pllay invoked');
   }
 
   void pause() async {
     await audioPlayer.pause();
-    log('pause invoked');
   }
 
   void stop() async {
     await audioPlayer.stop();
-    log('stop invoked');
   }
 
   AudioPlayer get player => audioPlayer;

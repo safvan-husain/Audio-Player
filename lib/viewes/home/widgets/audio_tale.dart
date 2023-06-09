@@ -12,7 +12,10 @@ import '../../../provider/audio_player_provider.dart';
 
 class AudioTale extends StatefulWidget {
   final String audioPath;
-  const AudioTale({super.key, required this.audioPath});
+  final AudioServices audio;
+  AudioTale({Key? key, required this.audioPath})
+      : audio = AudioServices(audioPath: audioPath),
+        super(key: key);
 
   @override
   State<AudioTale> createState() => _AudioTaleState();
@@ -23,10 +26,11 @@ class _AudioTaleState extends State<AudioTale> {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
+        // AudioServices audio = AudioServices(audioPath: widget.audioPath);
         log(extractFileName(widget.audioPath));
         Provider.of<AudioPlayerProvider>(context, listen: false).appenAudio(
           extractFileName(widget.audioPath),
-          widget.audioPath,
+          widget.audio,
         );
       },
       child: SizedBox(

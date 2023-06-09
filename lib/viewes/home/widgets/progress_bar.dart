@@ -1,19 +1,22 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:developer';
 
 import 'package:audio_video_progress_bar/audio_video_progress_bar.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../provider/audio_player_provider.dart';
 import '../../../services/audio_services.dart';
-import '../../../utils/audio_name.dart';
 
 class AudioControl extends StatefulWidget {
   final String audioPath;
   final AudioServices player;
-  AudioControl({Key? key, required this.audioPath})
-      : player = AudioServices(audioPath: audioPath),
-        super(key: key);
+  const AudioControl({
+    Key? key,
+    required this.player,
+    required this.audioPath,
+  }) : super(key: key);
 
   @override
   State<AudioControl> createState() => _AudioControlState();
@@ -28,7 +31,7 @@ class _AudioControlState extends State<AudioControl> {
   void dispose() async {
     isDispose = false;
     super.dispose();
-    await widget.player.player.dispose();
+    // await widget.player.player.dispose();
   }
 
   @override
@@ -40,6 +43,7 @@ class _AudioControlState extends State<AudioControl> {
         });
       }
     });
+    PlayerState current = PlayerState.playing;
     return Container(
       margin: const EdgeInsets.all(5),
       decoration: BoxDecoration(
@@ -75,9 +79,9 @@ class _AudioControlState extends State<AudioControl> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  extractFileName(widget.audioPath),
-                  style: const TextStyle(
+                const Text(
+                  "name",
+                  style: TextStyle(
                     color: Colors.blueAccent,
                     fontSize: 18,
                     fontStyle: FontStyle.italic,
@@ -89,12 +93,15 @@ class _AudioControlState extends State<AudioControl> {
                     children: [
                       InkWell(
                         onTap: () {
-                          if (isPlaying) {
+                          widget.player.player.onPlayerStateChanged
+                              .listen((PlayerState s) {
+                            current = s;
+                          });
+                          if (current == PlayerState.playing) {
                             widget.player.pause();
                           } else {
                             widget.player.play();
                           }
-                          log(extractFileName(widget.audioPath));
                           isPlaying = !isPlaying;
                         },
                         child: const Icon(Icons.play_arrow_outlined),
@@ -102,10 +109,9 @@ class _AudioControlState extends State<AudioControl> {
                       InkWell(
                         onTap: () {
                           // widget.player.stop();
-                          log(extractFileName(widget.audioPath));
                           Provider.of<AudioPlayerProvider>(context,
                                   listen: false)
-                              .stopAudio(extractFileName(widget.audioPath));
+                              .stopAudio(widget.audioPath);
                         },
                         child: const Icon(Icons.stop_circle_outlined),
                       ),

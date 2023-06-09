@@ -33,9 +33,6 @@ class _AudioViewState extends State<AudioView> {
                   fit: BoxFit.cover,
                 ),
               ),
-              AudioControl(
-                audioPath: widget.audioPath,
-              )
             ],
           ),
         ),
