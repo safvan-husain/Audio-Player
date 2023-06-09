@@ -35,9 +35,9 @@ This is a simple audio player built with Flutter that allows you to play multipl
 
 1. Open the project in your preferred IDE or editor.
 
-2. Locate the `lib` folder and navigate to `audio_list.dart`.
+2. Locate the `lib` folder and navigate to `views/home/widgets/audio_list.dart`.
 
-3. Modify the `audioFiles` list in `main.dart` to include the paths of the audio files you want to play. For example:
+3. Modify the `audioPaths` list in `audio_list.dart` to include the paths of the audio files you want to play. For example:
 
    ```dart
    List<String> audioPaths = [
