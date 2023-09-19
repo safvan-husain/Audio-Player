@@ -1,22 +1,27 @@
+import 'package:audio_player/database/database_service.dart';
 import 'package:audio_player/provider/audio_player_provider.dart';
-import 'package:audio_player/provider/current_index_provider.dart';
-import 'package:audio_player/provider/faviourate_audio_provider.dart';
-import 'package:audio_player/utils/bottom_nav_bar.dart';
-import 'package:audio_player/viewes/home/home_view.dart';
-import 'package:audio_player/viewes/home/widgets/audio_controll.dart';
-import 'package:audio_player/viewes/favourite/favourite_view.dart';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-void main() {
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(create: (_) => CurrentIndexProvider()),
-      ChangeNotifierProvider(create: (_) => FavouriteAudioProvider()),
-      ChangeNotifierProvider(create: (_) => AudioPlayerProvider()),
-    ],
-    child: const MyApp(),
-  ));
+import 'package:audio_player/utils/audio_name.dart';
+import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
+import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
+import 'package:audio_player/viewes/home/home_view.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  DataBaseService dataBaseService = DataBaseService();
+  await dataBaseService.init();
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider<HomeBloc>(create: (ctx) => HomeBloc()),
+        BlocProvider<AudioBloc>(create: (ctx) => AudioBloc()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -24,73 +29,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  final List<Widget> _pages = [
-    const HomeView(),
-    const FavouriteView(),
-    const Center(
-      child: Text('music'),
-    ),
-    const Center(
-      child: Text('account'),
-    ),
-    const Center(
-      child: Text('m'),
-    ),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        extendBody: true,
-        backgroundColor: Colors.transparent,
-        body: Stack(
-          children: [
-            _pages
-                .elementAt(context.watch<CurrentIndexProvider>().currentIndex),
-            if (context.watch<AudioPlayerProvider>().length() > 0)
-              audios(context)
-          ],
-        ),
-        bottomNavigationBar: const BottomNav());
-  }
-
-  Positioned audios(BuildContext context) {
-    return Positioned(
-      bottom: 80,
-      left: 1,
-      right: 1,
-      child: Column(
-        children: context
-            .watch<AudioPlayerProvider>()
-            .audioPlayer
-            .entries
-            .map((entry) => AudioControl(
-                  player: entry.value,
-                  audioPath: entry.key,
-                ))
-            .toList(),
-      ),
+    return ScreenUtilInit(
+      designSize: const Size(360, 690),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: const HomeView(),
+        );
+      },
     );
   }
 }

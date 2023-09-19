@@ -1,12 +1,16 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
+import 'dart:developer';
+
 import 'package:audioplayers/audioplayers.dart';
 
 class AudioServices {
   String audioPath;
+  bool isLocal;
 
   AudioServices({
     required this.audioPath,
+    this.isLocal = false,
   }) {
     _set();
   }
@@ -14,11 +18,16 @@ class AudioServices {
   final AudioPlayer audioPlayer = AudioPlayer();
 
   Future<void> _set() async {
-    await audioPlayer.setSource(AssetSource(audioPath));
+    await player.setSource(DeviceFileSource(audioPath));
   }
 
   void play() async {
-    await audioPlayer.resume();
+    try {
+      await audioPlayer.resume();
+      log('should be playing.');
+    } catch (e) {
+      log(e.toString());
+    }
   }
 
   void pause() async {

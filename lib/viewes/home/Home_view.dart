@@ -1,82 +1,39 @@
 import 'package:audio_player/common/icon_box.dart';
+import 'package:audio_player/utils/audio_name.dart';
+import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:audio_player/viewes/home/widgets/audio_list.dart';
-import 'package:audio_player/viewes/home/widgets/music_image.dart';
-import 'package:audio_player/viewes/home/widgets/selectable_textbox.dart';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    context.read<HomeBloc>().add(RenderMusicHomeEvent());
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color.fromARGB(255, 46, 36, 76),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
-          child: SingleChildScrollView(
-            child: SizedBox(
-              height: MediaQuery.of(context).size.height,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  builtSearchBar(),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Trending right now',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+          child: BlocBuilder<HomeBloc, HomeState>(
+            builder: (ctx, state) {
+              return switch (state) {
+                HomeInitial() => const Center(
+                    child: CircularProgressIndicator(),
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  builtCarouselMusic(),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const SelectableTextOptions(),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  const AudioList()
-                ],
-              ),
-            ),
+                HomeLoaded(audioPaths: var paths) => AudioList(paths: paths),
+              };
+            },
           ),
         ),
       ),
-    );
-  }
-
-  SingleChildScrollView builtCarouselMusic() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          MusicImage(
-            audioPath: 'audios/adam_john.mp3',
-            name: 'Adam Joan',
-            image: 'assets/images/pop.jpeg',
-          ),
-          const SizedBox(width: 20),
-          MusicImage(
-            audioPath: 'audios/aaro.mp3',
-            name: 'Aaro',
-            image: 'assets/images/pop3.jpeg',
-          ),
-          const SizedBox(width: 20),
-          MusicImage(
-            audioPath: 'audios/bgm.mp3',
-            name: 'BGM',
-            image: 'assets/images/pop2.jpeg',
-          ),
-        ],
-      ),
+      floatingActionButton: FloatingActionButton(onPressed: () async {
+        await getFilePath();
+        context.read<HomeBloc>().add(RenderMusicHomeEvent());
+      }),
     );
   }
 
@@ -110,4 +67,3 @@ class HomeView extends StatelessWidget {
     );
   }
 }
-
