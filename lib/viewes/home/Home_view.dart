@@ -24,7 +24,7 @@ class HomeView extends StatelessWidget {
                 HomeInitial() => const Center(
                     child: CircularProgressIndicator(),
                   ),
-                HomeLoaded(audioPaths: var paths) => AudioList(paths: paths),
+                HomeLoaded(audioList: var paths) => AudioList(paths: paths),
               };
             },
           ),

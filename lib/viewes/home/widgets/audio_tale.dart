@@ -1,5 +1,6 @@
 import 'package:audio_player/database/database_service.dart';
 import 'package:audio_player/services/audio_services.dart';
+import 'package:audio_player/utils/audio_model.dart';
 import 'package:audio_player/utils/audio_name.dart';
 import 'package:audio_player/viewes/audio/audio_view.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
@@ -7,11 +8,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AudioTale extends StatefulWidget {
-  final String audioPath;
-  final AudioServices audio;
-  AudioTale({Key? key, required this.audioPath})
-      : audio = AudioServices(audioPath: audioPath),
-        super(key: key);
+  final int index;
+  final List<AudioModel> paths;
+  // final AudioServices audio;
+  const AudioTale({
+    Key? key,
+    required this.index,
+    required this.paths,
+  })
+  // : audio = AudioServices(audioPath: audioPath),
+  : super(key: key);
 
   @override
   State<AudioTale> createState() => _AudioTaleState();
@@ -24,10 +30,13 @@ class _AudioTaleState extends State<AudioTale> {
     return InkWell(
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(
-            builder: (c) => AudioView(audioPath: widget.audioPath)));
+            builder: (c) => AudioView(
+                  index: widget.index,
+                  paths: widget.paths,
+                )));
       },
       onLongPress: () {
-        DataBaseService().deleteMusicPath(widget.audioPath);
+        DataBaseService().deleteMusicPath(widget.paths[widget.index].audioPath);
         context.read<HomeBloc>().add(RenderMusicHomeEvent());
       },
       child: SizedBox(
@@ -54,7 +63,7 @@ class _AudioTaleState extends State<AudioTale> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    extractFileName(widget.audioPath),
+                    extractFileName(widget.paths[widget.index].audioPath),
                     style: const TextStyle(
                       fontSize: 15,
                       color: Colors.white,
@@ -72,14 +81,7 @@ class _AudioTaleState extends State<AudioTale> {
               ),
             ),
             InkWell(
-              onTap: () {
-                if (isPlaying) {
-                  widget.audio.pause();
-                } else {
-                  widget.audio.play();
-                }
-                isPlaying = !isPlaying;
-              },
+              onTap: () {},
               child: const Icon(
                 Icons.favorite_outline,
                 color: Colors.redAccent,

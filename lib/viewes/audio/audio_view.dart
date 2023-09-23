@@ -1,18 +1,30 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:developer';
+import 'dart:io';
+import 'package:audio_player/utils/audio_model.dart';
+import 'package:audio_player/viewes/audio/widgets/waveform.dart';
+import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:just_waveform/just_waveform.dart';
 
+import 'package:path_provider/path_provider.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
 import 'package:audio_player/viewes/audio/widgets/indicator.dart';
 import 'package:audio_player/viewes/audio/widgets/music_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:rxdart/rxdart.dart';
+import 'dart:developer' as d;
 
 class AudioView extends StatefulWidget {
-  final String audioPath;
+  final int index;
+  final List<AudioModel> paths;
   const AudioView({
     Key? key,
-    required this.audioPath,
+    required this.index,
+    required this.paths,
   }) : super(key: key);
 
   @override
@@ -20,64 +32,74 @@ class AudioView extends StatefulWidget {
 }
 
 class _AudioViewState extends State<AudioView> {
+  // late AudioPlayer player;
+  // Duration currentDuration = Duration.zero;
+  bool isPlaying = true;
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      log('loging audio init event');
       context.read<AudioBloc>().add(
-            AudioInitEvent(widget.audioPath, MediaQuery.of(context).size.width),
+            AudioInitEvent(
+                widget.paths, MediaQuery.of(context).size.width, widget.index),
           );
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    // player.dispose();
   }
 
   // Future<void> prepare() async {
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AudioBloc, AudioState>(
-      listener: (context, state) {
-        // TODO: implement listener
-      },
-      child: WillPopScope(
-        onWillPop: () async {
-          log('before pop');
-          log('AudioBloc state: ${context.read<AudioBloc>().state}');
-          try {
-            context.read<AudioBloc>().add(AudioEndEvent());
-          } catch (e) {
-            throw ('Exception thrown: $e');
-          }
-          log('after pop');
-          return true;
-        },
-        child: Scaffold(
-          backgroundColor: Colors.amber,
-          body: SafeArea(
-            child: Padding(
-              padding: EdgeInsets.only(
-                top: 100.h,
-                left: 20.w,
-                right: 20.w,
-                bottom: 20.h,
-              ),
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    CircleAvatar(
-                      radius: 90.r,
-                    ),
-                   const Spacer(),
-                    const Indicators(),
-                    const MusicController()
-                  ],
+    return BlocBuilder<AudioBloc, AudioState>(
+      builder: (context, state) {
+        return WillPopScope(
+          onWillPop: () async {
+            try {
+              context.read<AudioBloc>().add(AudioEndEvent());
+            } catch (e) {
+              throw ('Exception thrown: $e');
+            }
+            return true;
+          },
+          child: Scaffold(
+            backgroundColor: Colors.amber,
+            body: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  top: 80.h,
+                  left: 20.w,
+                  right: 20.w,
+                  bottom: 20.h,
+                ),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      CircleAvatar(
+                        radius: 90.r,
+                      ),
+                      const Spacer(),
+                      const Indicators(),
+                      MusicController(
+                        index: widget.index,
+                        paths: widget.paths,
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
