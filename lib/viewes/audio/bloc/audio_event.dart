@@ -4,11 +4,11 @@ part of 'audio_bloc.dart';
 sealed class AudioEvent {}
 
 final class AudioInitEvent extends AudioEvent {
-  final List<AudioModel> audios;
+  final List<Track> tracks;
   final double width;
   final int index;
 
-  AudioInitEvent(this.audios, this.width, this.index);
+  AudioInitEvent(this.tracks, this.width, this.index);
 }
 
 final class AudioEndEvent extends AudioEvent {
@@ -22,18 +22,20 @@ final class AudioPositionChangedEvent extends AudioEvent {
 
 final class AudioPlayerStateChangedEvent extends AudioEvent {
   final PlayerState playerState;
-  AudioPlayerStateChangedEvent(this.playerState);
+  final double width;
+  AudioPlayerStateChangedEvent(this.playerState, this.width);
 }
 
 final class SwitchPlayerStateEvent extends AudioEvent {
   SwitchPlayerStateEvent();
 }
 
-final class NextMusicEvent extends AudioEvent {
-  final String audioPath;
+final class ChangeMusicEvent extends AudioEvent {
+  final List<Track> tracks;
   final double width;
+  final int index;
 
-  NextMusicEvent(this.audioPath, this.width);
+  ChangeMusicEvent(this.width, this.tracks, this.index);
 }
 
 final class TotalDurationEvent extends AudioEvent {

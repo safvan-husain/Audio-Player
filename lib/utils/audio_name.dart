@@ -47,10 +47,10 @@ Future<void> getFilePath() async {
         //     waveOutFile: waveFile,
         //   );
         // } catch (e) {}
-        await dataBaseService.insertMusicPath(AudioModel(
-          audioPath: file.path!,
-          waveformWrapper: null,
-        ));
+        // await dataBaseService.insertMusicPath(AudioModel(
+        //   audioPath: file.path!,
+        //   waveformWrapper: null,
+        // ));
       }
       // file = result.files.first;
       // final AudioPlayer audioPlayer = AudioPlayer();

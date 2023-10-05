@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:developer';
 import 'dart:io';
+import 'package:audio_player/services/track_model.dart';
 import 'package:audio_player/utils/audio_model.dart';
 import 'package:audio_player/viewes/audio/widgets/waveform.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
@@ -20,11 +21,11 @@ import 'dart:developer' as d;
 
 class AudioView extends StatefulWidget {
   final int index;
-  final List<AudioModel> paths;
+  final List<Track> tracks;
   const AudioView({
     Key? key,
     required this.index,
-    required this.paths,
+    required this.tracks,
   }) : super(key: key);
 
   @override
@@ -42,7 +43,7 @@ class _AudioViewState extends State<AudioView> {
       log('loging audio init event');
       context.read<AudioBloc>().add(
             AudioInitEvent(
-                widget.paths, MediaQuery.of(context).size.width, widget.index),
+                widget.tracks, MediaQuery.of(context).size.width, widget.index),
           );
     });
   }
@@ -57,6 +58,9 @@ class _AudioViewState extends State<AudioView> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AudioBloc, AudioState>(
+      buildWhen: (previous, current) {
+        return false;
+      },
       builder: (context, state) {
         return WillPopScope(
           onWillPop: () async {
@@ -68,31 +72,38 @@ class _AudioViewState extends State<AudioView> {
             return true;
           },
           child: Scaffold(
-            backgroundColor: Colors.amber,
             body: SafeArea(
-              child: Padding(
-                padding: EdgeInsets.only(
-                  top: 80.h,
-                  left: 20.w,
-                  right: 20.w,
-                  bottom: 20.h,
-                ),
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      CircleAvatar(
-                        radius: 90.r,
+              child: GestureDetector(
+                onVerticalDragEnd: (details) {
+                  if (details.primaryVelocity! > 0) {
+                    Navigator.of(context).pop();
+                  }
+                },
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    top: 80.h,
+                    left: 20.w,
+                    right: 20.w,
+                    bottom: 20.h,
+                  ),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    child: Hero(
+                      tag: 'heri',
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Flexible(child: CircleAvatar(radius: 90.r)),
+                          const Spacer(),
+                          const Indicators(),
+                          MusicController(
+                            index: widget.index,
+                            tracks: widget.tracks,
+                          )
+                        ],
                       ),
-                      const Spacer(),
-                      const Indicators(),
-                      MusicController(
-                        index: widget.index,
-                        paths: widget.paths,
-                      )
-                    ],
+                    ),
                   ),
                 ),
               ),

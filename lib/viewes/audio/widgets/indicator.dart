@@ -17,24 +17,37 @@ class Indicators extends StatelessWidget {
       builder: (context, state) {
         return SizedBox(
           height: 100.h,
+          width: MediaQuery.of(context).size.width,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Icon(Icons.abc),
-                  Icon(Icons.abc),
-                  Icon(Icons.abc),
-                  Icon(Icons.abc),
-                ],
+              const Flexible(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Icon(Icons.abc),
+                    Icon(Icons.abc),
+                    Icon(Icons.abc),
+                    Icon(Icons.abc),
+                  ],
+                ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(formatDuration(state.currentDuration)),
-                  Text(formatDuration(state.totalDuration)),
-                ],
+              Flexible(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                        child: Text(
+                      formatDuration(state.currentDuration),
+                      style: Theme.of(context).textTheme.titleMedium,
+                    )),
+                    Flexible(
+                        child: Text(
+                      formatDuration(state.totalDuration),
+                      style: Theme.of(context).textTheme.titleMedium,
+                    )),
+                  ],
+                ),
               ),
             ],
           ),

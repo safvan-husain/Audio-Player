@@ -3,4 +3,6 @@ part of 'home_bloc.dart';
 @immutable
 sealed class HomeEvent {}
 
-final class RenderMusicHomeEvent extends HomeEvent {}
+final class RenderTracksFromDevice extends HomeEvent {}
+
+final class RenderTracksFromApp extends HomeEvent {}

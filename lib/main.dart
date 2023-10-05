@@ -1,3 +1,4 @@
+import 'package:audio_player/common/theme.dart';
 import 'package:audio_player/database/database_service.dart';
 import 'package:audio_player/provider/audio_player_provider.dart';
 
@@ -37,10 +38,9 @@ class MyApp extends StatelessWidget {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           title: 'Flutter Demo',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-          home: const HomeView(),
+          theme: MyTheme.light,
+          darkTheme: MyTheme.dark,
+          home: HomeView(),
         );
       },
     );

@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:audio_player/services/track_model.dart';
 import 'package:audio_player/utils/audio_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:io' as io;
@@ -21,52 +22,53 @@ class DataBaseService {
     return _db;
   }
 
-  ///Return Objects from [music_path] Db column.
-  Future<List<AudioModel>> getAllMusic() async {
-    List<AudioModel> list = [];
-    List<Map<String, Object?>> res =
-        await _db.rawQuery("SELECT * FROM music_path");
+  ///Return Objects from [Tracks] Db column.
+  Future<List<Track>> getAllTracks() async {
+    List<Track> list = [];
+    List<Map<String, Object?>> res = await _db.rawQuery("SELECT * FROM Tracks");
     for (var r in res) {
-      list.add(AudioModel.fromMap(r));
+      list.add(Track.fromMap(r));
     }
+    log('get all music callled');
     print(res);
     return list;
   }
 
-  Future<void> insertMusicPath(AudioModel audio) async {
-    if (!await _checkPathExist(audio.audioPath)) {
+  Future<void> insertMusicPath(Track track) async {
+    if (!await _checkTrackExist(track.trackName)) {
       await _db.insert(
-        'music_path',
-        audio.toMap(),
+        'Tracks',
+        track.toMap(),
       );
     }
   }
 
-  Future<void> storeWaveForm(AudioModel audio) async {
+  Future<void> storeWaveForm(Track track) async {
+    throw ('not implemented');
     await _db.update(
-      'music_path',
-      audio.toMap(),
-      where: "audioPath = ?",
-      whereArgs: [audio.audioPath],
+      'Tracks',
+      track.toMap(),
+      where: "trackName = ?",
+      whereArgs: [track.trackName],
     );
     log('wave form saved');
   }
 
-  Future<void> deleteMusicPath(String path) async {
+  Future<void> deleteTrack(String trackName) async {
     await _db.delete(
-      'music_path',
-      where: 'audioPath = ?',
-      whereArgs: [path],
+      'Tracks',
+      where: 'trackName = ?',
+      whereArgs: [trackName],
     );
   }
 
-  Future<bool> _checkPathExist(String path) async {
+  Future<bool> _checkTrackExist(String trackName) async {
     var re = await _db
-        .rawQuery("SELECT * FROM music_path WHERE audioPath = '$path'");
+        .rawQuery("SELECT * FROM Tracks WHERE trackName = '$trackName'");
     if (re.isEmpty) {
       return false;
     }
-    log('music path already exists');
+    log('track already exists');
     return true;
   }
 
@@ -79,10 +81,12 @@ class DataBaseService {
 
   void _onCreate(Database db, int version) async {
     // When creating the db, create the table
-    await db.execute(
-        'CREATE TABLE music_path (id INTEGER PRIMARY KEY AUTOINCREMENT,'
-        ' audioPath TEXT,'
-        ' waveformWrapper TEXT'
-        ')');
+    await db
+        .execute('CREATE TABLE Tracks (id INTEGER PRIMARY KEY AUTOINCREMENT,'
+            ' trackName TEXT,'
+            ' trackDetail TEXT,'
+            ' trackUrl TEXT,'
+            ' waveformWrapper TEXT'
+            ')');
   }
 }

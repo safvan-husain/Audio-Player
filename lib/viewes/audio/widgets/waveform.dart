@@ -14,12 +14,16 @@ class WaveFormControl extends StatelessWidget {
     required this.player,
     required this.isPlaying,
     required this.currentDuration,
+    required this.color,
+    required this.backgroundColor,
   });
 
   final Waveform waveform;
   final AudioPlayer player;
   final bool isPlaying;
   final Duration currentDuration;
+  final Color color;
+  final Color backgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +62,8 @@ class WaveFormControl extends StatelessWidget {
               currentDuration: state.currentDuration,
               strokeWidth: 2.0,
               pixelsPerStep: 3.0,
+              color: color,
+              backgroundColor: backgroundColor,
             ),
           ),
         );
@@ -67,7 +73,6 @@ class WaveFormControl extends StatelessWidget {
 }
 
 class AudioWaveformWidget extends StatefulWidget {
-  final Color waveColor;
   final double scale;
   final double strokeWidth;
   final double pixelsPerStep;
@@ -75,6 +80,8 @@ class AudioWaveformWidget extends StatefulWidget {
   final Duration start;
   final Duration duration;
   final Duration currentDuration;
+  final Color color;
+  final Color backgroundColor;
 
   const AudioWaveformWidget({
     Key? key,
@@ -82,7 +89,8 @@ class AudioWaveformWidget extends StatefulWidget {
     required this.start,
     required this.duration,
     required this.currentDuration,
-    this.waveColor = Colors.blue,
+    required this.color,
+    required this.backgroundColor,
     this.scale = 1.0,
     this.strokeWidth = 5.0,
     this.pixelsPerStep = 8.0,
@@ -99,7 +107,6 @@ class _AudioWaveformState extends State<AudioWaveformWidget> {
     return ClipRect(
       child: CustomPaint(
         painter: AudioWaveformPainter(
-          waveColor: widget.waveColor,
           waveform: widget.waveform,
           start: widget.start,
           duration: widget.duration,
@@ -107,6 +114,8 @@ class _AudioWaveformState extends State<AudioWaveformWidget> {
           strokeWidth: widget.strokeWidth,
           pixelsPerStep: widget.pixelsPerStep,
           currentDuration: widget.currentDuration,
+          color: widget.color,
+          backgroundColor: widget.backgroundColor,
         ),
       ),
     );
@@ -122,13 +131,16 @@ class AudioWaveformPainter extends CustomPainter {
   final Duration start;
   final Duration duration;
   final Duration currentDuration;
+  final Color color;
+  final Color backgroundColor;
 
   AudioWaveformPainter({
     required this.waveform,
     required this.start,
     required this.duration,
     required this.currentDuration,
-    Color waveColor = Colors.blue,
+    required this.color,
+    required this.backgroundColor,
     this.scale = 1.0,
     this.strokeWidth = 5.0,
     this.pixelsPerStep = 8.0,
@@ -136,7 +148,6 @@ class AudioWaveformPainter extends CustomPainter {
           ..style = PaintingStyle.stroke
           ..strokeWidth = strokeWidth
           ..strokeCap = StrokeCap.round;
-  // ..color = waveColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -157,9 +168,10 @@ class AudioWaveformPainter extends CustomPainter {
       // d.log("currentDuration new painet : " + currentDuration.toString());
       final playedPart = waveform.positionToPixel(currentDuration).toInt();
       if (sampleIdx <= playedPart) {
-        wavePaint.color = Colors.red; // Change the color of the played part
+        wavePaint.color = color; // Change the color of the played part
       } else {
-        wavePaint.color = Colors.blue; // Change the color of the unplayed part
+        wavePaint.color =
+            backgroundColor; // Change the color of the unplayed part
       }
       final x = i / waveformPixelsPerDevicePixel;
       final minY = normalise(waveform.getPixelMin(sampleIdx), height);
