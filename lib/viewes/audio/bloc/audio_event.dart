@@ -7,8 +7,9 @@ final class AudioInitEvent extends AudioEvent {
   final List<Track> tracks;
   final double width;
   final int index;
+  final void Function() onNavigate;
 
-  AudioInitEvent(this.tracks, this.width, this.index);
+  AudioInitEvent(this.tracks, this.width, this.index, this.onNavigate);
 }
 
 final class AudioEndEvent extends AudioEvent {

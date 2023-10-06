@@ -1,4 +1,5 @@
 import 'package:audio_player/utils/audio_name.dart';
+import 'package:audio_player/viewes/audio/audio_view.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
 import 'package:audio_player/viewes/home/widgets/audio_progress.dart';
 import 'package:flutter/material.dart';
@@ -14,22 +15,28 @@ class AudioControl extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Card(
-        color: Theme.of(context).cardColor,
-        child: Container(
-          margin: const EdgeInsets.all(5),
-          width: MediaQuery.of(context).size.width,
-          height: 50.h,
-          child: BlocBuilder<AudioBloc, AudioState>(
-            builder: (context, state) {
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildNameAndButtons(context, state),
-                  const AudioProgress(),
-                ],
-              );
-            },
+      child: GestureDetector(
+        onTap: () {
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (c) => const AudioView()));
+        },
+        child: Card(
+          color: Theme.of(context).cardColor,
+          child: Container(
+            margin: const EdgeInsets.all(5),
+            width: MediaQuery.of(context).size.width,
+            height: 50.h,
+            child: BlocBuilder<AudioBloc, AudioState>(
+              builder: (context, state) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    _buildNameAndButtons(context, state),
+                    const AudioProgress(),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),

@@ -13,13 +13,7 @@ import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
 import 'package:audio_player/viewes/audio/widgets/waveform.dart';
 
 class MusicController extends StatelessWidget {
-  final int index;
-  final List<Track> tracks;
-  const MusicController({
-    Key? key,
-    required this.index,
-    required this.tracks,
-  }) : super(key: key);
+  const MusicController({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -53,11 +47,12 @@ class MusicController extends StatelessWidget {
   ) {
     return Column(
       children: [
-        if (tracks[index].waveformWrapper == null)
+        if (state.tracks[state.currentIndex].waveformWrapper == null)
           _progressStreamBuilder(state, controller)
         else
           WaveFormControl(
-            waveform: tracks[index].waveformWrapper!.waveform,
+            waveform:
+                state.tracks[state.currentIndex].waveformWrapper!.waveform,
             player: state.controller!,
             isPlaying: state.isPlaying,
             currentDuration: state.currentDuration,

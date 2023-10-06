@@ -28,6 +28,7 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
     on<AudioInitEvent>((event, emit) async {
       if (state.controller == null) {
         await _onControllerNull(emit, event);
+        event.onNavigate();
       } else if (_isCurrentlyPlayingAndSelectedNotSame(event)) {
         //if the current audio is different from selected audio.
         add(ChangeMusicEvent(event.width, event.tracks, event.index));
@@ -94,6 +95,7 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
         event.tracks,
         event.width,
         event.index,
+        () {},
       ));
     });
   }
@@ -183,7 +185,7 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
     ));
     log(event.tracks[event.index].trackName);
     await state.controller!
-        .play(DeviceFileSource(event.tracks[event.index].trackName));
+        .play(DeviceFileSource(event.tracks[event.index].trackUrl));
   }
 }
 

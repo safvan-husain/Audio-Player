@@ -10,17 +10,19 @@ class Track {
   final WaveformWrapper? waveformWrapper;
 
   Track({
-    required this.trackName,
+    required String trackName,
     required this.trackDetail,
     required this.trackUrl,
     this.waveformWrapper,
-  });
+  }) : trackName = trackName.replaceAll("'", " ").replaceAll("/", "|");
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'trackName': trackName,
       'trackDetail': trackDetail,
       'trackUrl': trackUrl,
+      'waveformWrapper':
+          waveformWrapper != null ? waveformWrapper!.toJson() : null,
     };
   }
 
@@ -29,6 +31,9 @@ class Track {
       trackName: map['trackName'] as String,
       trackDetail: map['trackDetail'] as String,
       trackUrl: map['trackUrl'] as String,
+      waveformWrapper: map['waveformWrapper'] == null
+          ? null
+          : WaveformWrapper.fromJson(map['waveformWrapper'] as String),
     );
   }
 

@@ -27,14 +27,15 @@ class DataBaseService {
     List<Track> list = [];
     List<Map<String, Object?>> res = await _db.rawQuery("SELECT * FROM Tracks");
     for (var r in res) {
+      print(r['trackName']);
       list.add(Track.fromMap(r));
     }
-    log('get all music callled');
+    log('get all music callled ${res.length}');
     print(res);
     return list;
   }
 
-  Future<void> insertMusicPath(Track track) async {
+  Future<void> insertTrack(Track track) async {
     if (!await _checkTrackExist(track.trackName)) {
       await _db.insert(
         'Tracks',
@@ -44,7 +45,6 @@ class DataBaseService {
   }
 
   Future<void> storeWaveForm(Track track) async {
-    throw ('not implemented');
     await _db.update(
       'Tracks',
       track.toMap(),
@@ -66,6 +66,7 @@ class DataBaseService {
     var re = await _db
         .rawQuery("SELECT * FROM Tracks WHERE trackName = '$trackName'");
     if (re.isEmpty) {
+      log('track don\'t exists');
       return false;
     }
     log('track already exists');
