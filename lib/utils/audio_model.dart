@@ -1,6 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
-
 import 'package:audio_player/utils/waveform_extension.dart';
 
 class AudioModel {
@@ -28,8 +25,8 @@ class AudioModel {
     );
   }
 
-  String toJson() => json.encode(toMap());
+  // String toJson() => json.encode(toMap());
 
-  factory AudioModel.fromJson(String source) =>
-      AudioModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  // factory AudioModel.fromJson(String source) =>
+  //     AudioModel.fromMap(json.decode(source) as Map<String, dynamic>);
 }

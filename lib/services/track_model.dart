@@ -1,6 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:convert';
-
 import 'package:audio_player/utils/waveform_extension.dart';
 
 class Track {
@@ -8,12 +5,14 @@ class Track {
   final String trackDetail;
   final String trackUrl;
   final WaveformWrapper? waveformWrapper;
+  bool isFavorite;
 
   Track({
     required String trackName,
     required this.trackDetail,
     required this.trackUrl,
     this.waveformWrapper,
+    this.isFavorite = false,
   }) : trackName = trackName.replaceAll("'", " ").replaceAll("/", "|");
 
   Map<String, dynamic> toMap() {
@@ -37,8 +36,8 @@ class Track {
     );
   }
 
-  String toJson() => json.encode(toMap());
+  // String toJson() => json.encode(toMap());
 
-  factory Track.fromJson(String source) =>
-      Track.fromMap(json.decode(source) as Map<String, dynamic>);
+  // factory Track.fromJson(String source) =>
+  //     Track.fromMap(json.decode(source) as Map<String, dynamic>);
 }

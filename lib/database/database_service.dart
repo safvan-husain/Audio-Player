@@ -117,25 +117,37 @@ class DataBaseService {
     return true;
   }
 
+  Future<List<String>> getAllFavorites() async {
+    List<Track> favorites = await getTracksFromPlayList('favorites');
+    return favorites.map((e) => e.trackName).toList();
+  }
+
 //PlayList linking methods.
   Future<void> addTrackToFavorites(String trackName) async {
-    // Get the track id from the Tracks table
-    var track = await _db
-        .query('Tracks', where: 'trackName = ?', whereArgs: [trackName]);
+    // // Get the track id from the Tracks table
+    // var track = await _db
+    //     .query('Tracks', where: 'trackName = ?', whereArgs: [trackName]);
 
-    // Get the 'favorites' playlist id from the Playlists table
-    var playlist = await _db.query('Playlists',
-        where: 'playlistName = ?', whereArgs: ['favorites']);
+    // // Get the 'favorites' playlist id from the Playlists table
+    // var playlist = await _db.query('Playlists',
+    //     where: 'playlistName = ?', whereArgs: ['favorites']);
 
-    int trackId = track[0]['id'] as int;
-    int playlistId = playlist[0]['id'] as int;
+    // int trackId = track[0]['id'] as int;
+    // int playlistId = playlist[0]['id'] as int;
 
-    // Check if the track is already in the 'favorites' playlist
-    if (!await _isTrackInPlaylist(trackId, playlistId)) {
-      // If not, insert the track into the 'favorites' playlist
-      await _db.insert(
-          'Playlist_Tracks', {"playlistId": playlistId, "trackId": trackId});
-    }
+    // // Check if the track is already in the 'favorites' playlist
+    // if (!await _isTrackInPlaylist(trackId, playlistId)) {
+    //   // If not, insert the track into the 'favorites' playlist
+    //   await _db.insert(
+    //       'Playlist_Tracks', {"playlistId": playlistId, "trackId": trackId});
+    // }
+    await addTrackToPlayList(trackName, 'favorites');
+    log('added to favorites');
+  }
+
+  Future<void> removeFromFavorite(String trackName) async {
+    await removeTrackFromPlaylist(trackName, 'favorites');
+    log('removed from fav');
   }
 
   Future<void> addTrackToPlayList(String trackName, String playListName) async {

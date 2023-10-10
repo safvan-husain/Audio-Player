@@ -1,6 +1,8 @@
 import 'dart:developer';
 
+import 'package:audio_player/services/track_model.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
+import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 // import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:audio_player/viewes/playlist_pop_up_window/bloc/play_list_window_bloc.dart'
     as s;
@@ -10,8 +12,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class Indicators extends StatelessWidget {
+class Indicators extends StatefulWidget {
   const Indicators({super.key});
+
+  @override
+  State<Indicators> createState() => _IndicatorsState();
+}
+
+class _IndicatorsState extends State<Indicators> {
+  late final AudioBloc _audioBloc = context.read<AudioBloc>();
+  late final Track track = context
+      .read<AudioBloc>()
+      .homeBloc
+      .state
+      .trackList[_audioBloc.state.currentIndex];
+  bool isFavorite = false;
+  @override
+  void initState() {
+    isFavorite = track.isFavorite != null ? track.isFavorite! : false;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,12 +55,7 @@ class Indicators extends StatelessWidget {
                       Flexible(
                         child: InkWell(
                             onTap: () {
-                              String trackName = context
-                                  .read<AudioBloc>()
-                                  .homeBloc
-                                  .state
-                                  .trackList[state.currentIndex]
-                                  .trackName;
+                              String trackName = track.trackName;
                               context
                                   .read<s.PlayListWindowBloc>()
                                   .add(s.LoadPlayLists(trackName, () {
@@ -55,12 +70,17 @@ class Indicators extends StatelessWidget {
                       const Flexible(child: Icon(Icons.repeat)),
                       Flexible(
                           child: InkWell(
-                              onTap: () {
-                                context
-                                    .read<AudioBloc>()
-                                    .add(AddTrackToFavorites());
-                              },
-                              child: Icon(Icons.favorite))),
+                        onTap: () {
+                          setState(() => isFavorite = !isFavorite);
+                          context
+                              .read<HomeBloc>()
+                              .add(Favorite(isFavorite, track.trackName));
+                        },
+                        child: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_outline,
+                          color: Colors.redAccent,
+                        ),
+                      )),
                     ],
                   ),
                 ),

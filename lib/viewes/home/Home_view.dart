@@ -128,6 +128,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                         padding: const EdgeInsets.only(left: 20, right: 20),
                         child: BlocBuilder<HomeBloc, HomeState>(
                           builder: (ctx, state) {
+                            print(state.runtimeType);
                             return switch (state) {
                               HomeInitial() => const Center(
                                   child: CircularProgressIndicator(),

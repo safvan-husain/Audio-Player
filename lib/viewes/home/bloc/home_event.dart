@@ -12,3 +12,17 @@ final class RenderPlayList extends HomeEvent {
 
   RenderPlayList(this.playListName);
 }
+
+final class Favorite extends HomeEvent {
+  final bool isFavorite;
+  final String trackName;
+  Favorite(this.isFavorite, this.trackName);
+
+  // factory Favorite.add() {
+  //   return Favorite(true);
+  // }
+
+  // factory Favorite.remove() {
+  //   return Favorite(false);
+  // }
+}

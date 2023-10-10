@@ -1,6 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:developer';
-
 import 'package:audio_player/services/track_model.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +20,6 @@ class MusicController extends StatelessWidget {
           current is AudioInitial ||
           current is AudioPlayerStateChangedState,
       builder: (context, state) {
-        log('on music Controller : ${state.runtimeType}');
         return switch (state) {
           AudioLoadedState(controller: var controller) ||
           TotalDurationState(controller: var controller) ||

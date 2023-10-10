@@ -1,6 +1,8 @@
+import 'package:audio_player/services/track_model.dart';
 import 'package:audio_player/utils/audio_name.dart';
 import 'package:audio_player/viewes/audio/audio_view.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
+import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:audio_player/viewes/home/widgets/audio_progress.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -17,6 +19,11 @@ class AudioControl extends StatefulWidget {
 
 class _AudioControlState extends State<AudioControl> {
   bool isVisible = false;
+  late final Track track = context
+      .read<AudioBloc>()
+      .homeBloc
+      .state
+      .trackList[context.read<AudioBloc>().state.currentIndex];
   @override
   void initState() {
     Future.delayed(
@@ -82,7 +89,7 @@ class _AudioControlState extends State<AudioControl> {
                   .read<AudioBloc>()
                   .homeBloc
                   .state
-                  .trackList[state.currentIndex]
+                  .trackList[context.read<AudioBloc>().state.currentIndex]
                   .trackName,
               style: Theme.of(context).textTheme.titleSmall,
             ),
@@ -107,17 +114,20 @@ class _AudioControlState extends State<AudioControl> {
                     ),
                   ),
                   Flexible(
-                    child: InkWell(
-                      onTap: () {
-                        context.read<AudioBloc>().add(ChangeMusicEvent(
-                            MediaQuery.of(context).size.width,
-                            context.read<AudioBloc>().homeBloc.state.trackList,
-                            state.currentIndex + 1));
+                    child: BlocBuilder<HomeBloc, HomeState>(
+                      buildWhen: (previous, current) => current is HomeLoaded,
+                      builder: (context, homeState) {
+                        Track myTrack = homeState.trackList[state.currentIndex];
+                        return InkWell(
+                          onTap: () {},
+                          child: Icon(
+                            myTrack.isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: Color.fromARGB(255, 240, 45, 58),
+                          ),
+                        );
                       },
-                      child: const Icon(
-                        Icons.favorite_border,
-                        color: Color.fromARGB(255, 240, 45, 58),
-                      ),
                     ),
                   ),
                 ],

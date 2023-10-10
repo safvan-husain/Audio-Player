@@ -1,13 +1,23 @@
 import 'package:audio_player/services/track_model.dart';
+import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class AudioTale extends StatelessWidget {
+class AudioTale extends StatefulWidget {
   final Track track;
 
   const AudioTale({Key? key, required this.track}) : super(key: key);
 
   @override
+  State<AudioTale> createState() => _AudioTaleState();
+}
+
+class _AudioTaleState extends State<AudioTale> {
+  bool isFavorite = false;
+
+  @override
   Widget build(BuildContext context) {
+    isFavorite = widget.track.isFavorite;
     return SizedBox(
       width: double.infinity,
       child: Row(
@@ -32,7 +42,7 @@ class AudioTale extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  track.trackName,
+                  widget.track.trackName,
                   style: const TextStyle(
                     fontSize: 15,
                     color: Colors.white,
@@ -41,7 +51,7 @@ class AudioTale extends StatelessWidget {
                 ),
                 const SizedBox(height: 5),
                 Text(
-                  track.trackDetail,
+                  widget.track.trackDetail,
                   style: const TextStyle(
                     color: Colors.grey,
                   ),
@@ -50,9 +60,16 @@ class AudioTale extends StatelessWidget {
             ),
           ),
           InkWell(
-            onTap: () {},
-            child: const Icon(
-              Icons.favorite_outline,
+            onTap: () {
+              setState(() {
+                isFavorite = !isFavorite;
+              });
+              context
+                  .read<HomeBloc>()
+                  .add(Favorite(isFavorite, widget.track.trackName));
+            },
+            child: Icon(
+              isFavorite ? Icons.favorite : Icons.favorite_outline,
               color: Colors.redAccent,
             ),
           )

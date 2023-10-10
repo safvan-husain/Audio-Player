@@ -43,14 +43,34 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     });
     on<RenderTracksFromApp>((event, emit) async {
       List<Track> tracks = await databaseServices.getAllTracks();
-      emit(HomeLoaded(trackList: tracks));
+      List<String> favTrackNames = await databaseServices.getAllFavorites();
+      log(favTrackNames.toString());
+      emit(HomeLoaded(trackList: setFavoriteTracks(tracks, favTrackNames)));
     });
     on<RenderPlayList>((event, emit) async {
       List<Track> tracks =
           await databaseServices.getTracksFromPlayList(event.playListName);
       emit(HomeLoaded(trackList: tracks));
     });
+    on<Favorite>((event, emit) async {
+      if (event.isFavorite) {
+        await databaseServices.addTrackToFavorites(event.trackName);
+      } else {
+        await databaseServices.removeFromFavorite(event.trackName);
+      }
+      add(RenderTracksFromApp());
+    });
   }
+}
+
+List<Track> setFavoriteTracks(
+    List<Track> tracks, List<String> favoriteTrackNames) {
+  for (Track track in tracks) {
+    if (favoriteTrackNames.contains(track.trackName)) {
+      track.isFavorite = true;
+    }
+  }
+  return tracks;
 }
 
 Future<bool> ensurePermissionGranted() async {
