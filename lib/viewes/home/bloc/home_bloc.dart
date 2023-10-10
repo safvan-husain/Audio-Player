@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:audio_player/database/database_service.dart';
 import 'package:audio_player/services/track_model.dart';
@@ -14,6 +15,7 @@ part 'home_state.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   static const platform = MethodChannel('example.com/channel');
   HomeBloc() : super(HomeInitial()) {
+    var databaseServices = DataBaseService();
     on<RenderTracksFromDevice>((event, emit) async {
       add(RenderTracksFromApp());
       List<Track> tracks = [];
@@ -35,12 +37,17 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         throw ('Permission denied');
       }
       for (var track in tracks) {
-        await DataBaseService().insertTrack(track);
+        await databaseServices.insertTrack(track);
       }
       add(RenderTracksFromApp());
     });
     on<RenderTracksFromApp>((event, emit) async {
-      List<Track> tracks = await DataBaseService().getAllTracks();
+      List<Track> tracks = await databaseServices.getAllTracks();
+      emit(HomeLoaded(trackList: tracks));
+    });
+    on<RenderPlayList>((event, emit) async {
+      List<Track> tracks =
+          await databaseServices.getTracksFromPlayList(event.playListName);
       emit(HomeLoaded(trackList: tracks));
     });
   }

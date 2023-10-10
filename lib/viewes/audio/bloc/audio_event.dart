@@ -43,3 +43,7 @@ final class TotalDurationEvent extends AudioEvent {
   final Duration totalDuration;
   TotalDurationEvent(this.totalDuration);
 }
+
+final class AddTrackToFavorites extends AudioEvent {}
+
+final class RemoveTrackFromFavorites extends AudioEvent {}

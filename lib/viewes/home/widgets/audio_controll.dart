@@ -6,36 +6,64 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class AudioControl extends StatelessWidget {
+class AudioControl extends StatefulWidget {
   const AudioControl({
     Key? key,
   }) : super(key: key);
 
   @override
+  State<AudioControl> createState() => _AudioControlState();
+}
+
+class _AudioControlState extends State<AudioControl> {
+  bool isVisible = false;
+  @override
+  void initState() {
+    Future.delayed(
+      const Duration(seconds: 1),
+      () {
+        setState(() => isVisible = true);
+      },
+    );
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (c) => const AudioView()));
-        },
-        child: Card(
-          color: Theme.of(context).cardColor,
-          child: Container(
-            margin: const EdgeInsets.all(5),
-            width: MediaQuery.of(context).size.width,
-            height: 50.h,
-            child: BlocBuilder<AudioBloc, AudioState>(
-              builder: (context, state) {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildNameAndButtons(context, state),
-                    const AudioProgress(),
-                  ],
-                );
+    return Visibility(
+      visible: isVisible,
+      child: Positioned(
+        bottom: 10,
+        left: 0,
+        right: 0,
+        child: Hero(
+          tag: 'heri',
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context)
+                    .push(MaterialPageRoute(builder: (c) => const AudioView()));
               },
+              child: Card(
+                color: Theme.of(context).cardColor,
+                child: Container(
+                  margin: const EdgeInsets.all(5),
+                  width: MediaQuery.of(context).size.width,
+                  height: 50.h,
+                  child: BlocBuilder<AudioBloc, AudioState>(
+                    builder: (context, state) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildNameAndButtons(context, state),
+                          const AudioProgress(),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ),
             ),
           ),
         ),
@@ -50,7 +78,12 @@ class AudioControl extends StatelessWidget {
         children: [
           Flexible(
             child: Text(
-              state.tracks[state.currentIndex].trackName,
+              context
+                  .read<AudioBloc>()
+                  .homeBloc
+                  .state
+                  .trackList[state.currentIndex]
+                  .trackName,
               style: Theme.of(context).textTheme.titleSmall,
             ),
           ),
@@ -78,7 +111,7 @@ class AudioControl extends StatelessWidget {
                       onTap: () {
                         context.read<AudioBloc>().add(ChangeMusicEvent(
                             MediaQuery.of(context).size.width,
-                            state.tracks,
+                            context.read<AudioBloc>().homeBloc.state.trackList,
                             state.currentIndex + 1));
                       },
                       child: const Icon(

@@ -5,9 +5,13 @@ import 'dart:developer';
 import 'package:audio_player/common/icon_box.dart';
 import 'package:audio_player/services/audio_download_service.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
+import 'package:audio_player/viewes/drawer/bloc/drawer_bloc.dart';
+import 'package:audio_player/viewes/drawer/drawer.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:audio_player/viewes/home/widgets/audio_controll.dart';
 import 'package:audio_player/viewes/home/widgets/audio_list.dart';
+import 'package:audio_player/viewes/drawer/drawer_widgets/play_list_view.dart';
+import 'package:audio_player/viewes/drawer/drawer_widgets/preferences.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,6 +29,8 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool isVisible = false;
+  bool _isPaused = false;
 
   @override
   void initState() {
@@ -55,8 +61,13 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // user returned to our app
-      context.read<HomeBloc>().add(RenderTracksFromDevice());
+      if (_isPaused) {
+        //checking it was paused or not, because resumed called with init,
+        //it result into calling twice RenderTracksFromDevice, and store tracks to storage twice.
+        context.read<HomeBloc>().add(RenderTracksFromDevice());
+      }
+    } else if (state == AppLifecycleState.paused) {
+      _isPaused = true;
     }
   }
 
@@ -75,73 +86,89 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       key: _scaffoldKey,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                height: 60.h,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        _scaffoldKey.currentState!.openDrawer();
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Icon(Icons.abc),
-                      ),
-                    ),
-                    const InkWell(
-                      child: Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Icon(Icons.abc),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Flexible(
-                child: Stack(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20, right: 20),
-                      child: BlocBuilder<HomeBloc, HomeState>(
-                        builder: (ctx, state) {
-                          return switch (state) {
-                            HomeInitial() => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            HomeLoaded(trackList: var trackList) =>
-                              AudioList(tracks: trackList),
-                          };
+        child: GestureDetector(
+          onHorizontalDragEnd: (DragEndDetails details) {
+            if (details.velocity.pixelsPerSecond.dx > 0) {
+              context.read<DrawerBloc>().add(ListPlayLists());
+              _scaffoldKey.currentState?.openDrawer();
+            }
+          },
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  height: 60.h,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          _scaffoldKey.currentState!.openDrawer();
                         },
-                      ),
-                    ),
-                    if (context.watch<AudioBloc>().state.controller != null)
-                      const Positioned(
-                        bottom: 10,
-                        left: 0,
-                        right: 0,
-                        child: Hero(
-                          tag: 'heri',
-                          child: AudioControl(),
+                        child: const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(Icons.abc),
                         ),
-                      )
-                  ],
+                      ),
+                      const InkWell(
+                        child: Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Icon(Icons.abc),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                Flexible(
+                  child: Stack(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20, right: 20),
+                        child: BlocBuilder<HomeBloc, HomeState>(
+                          builder: (ctx, state) {
+                            return switch (state) {
+                              HomeInitial() => const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              _ => AudioList(tracks: state.trackList),
+                            };
+                          },
+                        ),
+                      ),
+                      if (context.watch<AudioBloc>().state.controller != null)
+                        const AudioControl()
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
-      drawerEdgeDragWidth: 100.0,
-      drawer: Drawer(
-        child: ListView(children: [
-          const Text('hi'),
-        ]),
+      drawerEdgeDragWidth: 0.0,
+      drawer: const MyDrawer(),
+    );
+  }
+
+  Widget _buildController() {
+    Future.delayed(
+      const Duration(seconds: 1),
+      () {
+        setState(() => isVisible = true);
+      },
+    );
+    return Visibility(
+      visible: isVisible,
+      child: const Positioned(
+        bottom: 10,
+        left: 0,
+        right: 0,
+        child: Hero(
+          tag: 'heri',
+          child: AudioControl(),
+        ),
       ),
     );
   }

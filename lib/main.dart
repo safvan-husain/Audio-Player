@@ -4,8 +4,10 @@ import 'package:audio_player/provider/audio_player_provider.dart';
 
 import 'package:audio_player/utils/audio_name.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
+import 'package:audio_player/viewes/drawer/bloc/drawer_bloc.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:audio_player/viewes/home/home_view.dart';
+import 'package:audio_player/viewes/playlist_pop_up_window/bloc/play_list_window_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -14,11 +16,14 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   DataBaseService dataBaseService = DataBaseService();
   await dataBaseService.init();
+  HomeBloc homeBloc = HomeBloc();
   runApp(
     MultiBlocProvider(
       providers: [
-        BlocProvider<HomeBloc>(create: (ctx) => HomeBloc()),
-        BlocProvider<AudioBloc>(create: (ctx) => AudioBloc()),
+        BlocProvider<HomeBloc>(create: (ctx) => homeBloc),
+        BlocProvider<AudioBloc>(create: (ctx) => AudioBloc(homeBloc)),
+        BlocProvider<PlayListWindowBloc>(create: (ctx) => PlayListWindowBloc()),
+        BlocProvider<DrawerBloc>(create: (ctx) => DrawerBloc(homeBloc)),
       ],
       child: const MyApp(),
     ),

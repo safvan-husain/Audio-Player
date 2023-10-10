@@ -1,6 +1,11 @@
 import 'dart:developer';
 
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
+// import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
+import 'package:audio_player/viewes/playlist_pop_up_window/bloc/play_list_window_bloc.dart'
+    as s;
+import 'package:audio_player/viewes/playlist_pop_up_window/dailogue.dart';
+import 'package:audio_player/viewes/playlist_pop_up_window/pop_up_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,15 +26,43 @@ class Indicators extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Flexible(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Icon(Icons.abc),
-                    Icon(Icons.abc),
-                    Icon(Icons.abc),
-                    Icon(Icons.abc),
-                  ],
+              Flexible(
+                child: Material(
+                  color: Colors.transparent,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Flexible(
+                        child: InkWell(
+                            onTap: () {
+                              String trackName = context
+                                  .read<AudioBloc>()
+                                  .homeBloc
+                                  .state
+                                  .trackList[state.currentIndex]
+                                  .trackName;
+                              context
+                                  .read<s.PlayListWindowBloc>()
+                                  .add(s.LoadPlayLists(trackName, () {
+                                    Navigator.of(context).push(
+                                      PopUpRoute(PlayListDailogue(trackName)),
+                                    );
+                                  }));
+                            },
+                            child: const Icon(Icons.playlist_add)),
+                      ),
+                      const Flexible(child: Icon(Icons.shuffle)),
+                      const Flexible(child: Icon(Icons.repeat)),
+                      Flexible(
+                          child: InkWell(
+                              onTap: () {
+                                context
+                                    .read<AudioBloc>()
+                                    .add(AddTrackToFavorites());
+                              },
+                              child: Icon(Icons.favorite))),
+                    ],
+                  ),
                 ),
               ),
               Flexible(

@@ -51,10 +51,14 @@ class AudioView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Flexible(child: CircleAvatar(radius: 90.r)),
+                          Flexible(
+                            child: CircleAvatar(radius: 90.r),
+                          ),
                           const Spacer(),
-                          const Indicators(),
-                          MusicController()
+                          const Flexible(
+                            child: Indicators(),
+                          ),
+                          const MusicController()
                         ],
                       ),
                     ),

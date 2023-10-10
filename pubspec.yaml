@@ -51,6 +51,7 @@ dependencies:
   permission_handler:
   dio: ^4.0.6
   open_file: ^3.2.1
+  meta:
   url_launcher: ^6.1.14
 
 dev_dependencies:
