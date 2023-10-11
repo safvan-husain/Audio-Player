@@ -3,6 +3,7 @@ part of 'audio_bloc.dart';
 // @immutable
 sealed class AudioState {
   final int currentIndex;
+  final List<Track> tracks;
 
   final AudioPlayer? controller;
   final Duration currentDuration;
@@ -16,6 +17,7 @@ sealed class AudioState {
     required this.totalDuration,
     required this.currentIndex,
     required this.progressStream,
+    required this.tracks,
   });
 }
 
@@ -26,6 +28,7 @@ final class AudioInitial extends AudioState {
     super.totalDuration = Duration.zero,
     required super.currentIndex,
     required super.progressStream,
+    required super.tracks,
   });
 }
 
@@ -36,6 +39,7 @@ final class AudioEndState extends AudioState {
     required super.totalDuration,
     required super.currentIndex,
     required super.progressStream,
+    required super.tracks,
   });
 }
 
@@ -46,6 +50,7 @@ final class AudioLoadedState extends AudioState {
     required super.totalDuration,
     required super.currentIndex,
     required super.progressStream,
+    required super.tracks,
   });
 }
 
@@ -56,6 +61,7 @@ final class AudioPositionChangedState extends AudioState {
     required super.totalDuration,
     required super.currentIndex,
     required super.progressStream,
+    required super.tracks,
   });
 }
 
@@ -67,6 +73,7 @@ final class AudioPlayerStateChangedState extends AudioState {
     required super.totalDuration,
     required super.currentIndex,
     required super.progressStream,
+    required super.tracks,
   });
 }
 
@@ -77,5 +84,6 @@ final class TotalDurationState extends AudioState {
     required super.totalDuration,
     required super.currentIndex,
     required super.progressStream,
+    required super.tracks,
   });
 }

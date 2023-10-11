@@ -21,15 +21,12 @@ class Indicators extends StatefulWidget {
 
 class _IndicatorsState extends State<Indicators> {
   late final AudioBloc _audioBloc = context.read<AudioBloc>();
-  late final Track track = context
-      .read<AudioBloc>()
-      .homeBloc
-      .state
-      .trackList[_audioBloc.state.currentIndex];
+  late final Track track =
+      _audioBloc.state.tracks.elementAt(_audioBloc.state.currentIndex);
   bool isFavorite = false;
   @override
   void initState() {
-    isFavorite = track.isFavorite != null ? track.isFavorite! : false;
+    isFavorite = track.isFavorite;
     super.initState();
   }
 

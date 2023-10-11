@@ -43,21 +43,12 @@ class MusicController extends StatelessWidget {
   ) {
     return Column(
       children: [
-        if (context
-                .read<AudioBloc>()
-                .homeBloc
-                .state
-                .trackList[state.currentIndex]
-                .waveformWrapper ==
-            null)
+        if (state.tracks.elementAt(state.currentIndex).waveformWrapper == null)
           _progressStreamBuilder(state, controller)
         else
           WaveFormControl(
-            waveform: context
-                .read<AudioBloc>()
-                .homeBloc
-                .state
-                .trackList[state.currentIndex]
+            waveform: state.tracks
+                .elementAt(state.currentIndex)
                 .waveformWrapper!
                 .waveform,
             player: state.controller!,
@@ -141,18 +132,12 @@ class MusicController extends StatelessWidget {
             InkWell(
                 onTap: () {
                   context.read<AudioBloc>().add(ChangeMusicEvent(
-                        MediaQuery.of(context).size.width,
-                        context.read<AudioBloc>().homeBloc.state.trackList,
+                        state.tracks,
                         //if the index exceed the length start from beggning.
-                        state.currentIndex + 1 <
-                                context
-                                    .read<AudioBloc>()
-                                    .homeBloc
-                                    .state
-                                    .trackList
-                                    .length
-                            ? state.currentIndex + 1
-                            : 0,
+                        state.currentIndex > state.tracks.length - 2
+                            ? 0
+                            : state.currentIndex + 1,
+                        MediaQuery.of(context).size.width,
                       ));
                 },
                 child: const Icon(Icons.skip_next_rounded)),

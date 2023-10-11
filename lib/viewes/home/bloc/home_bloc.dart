@@ -44,30 +44,61 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<RenderTracksFromApp>((event, emit) async {
       List<Track> tracks = await databaseServices.getAllTracks();
       List<String> favTrackNames = await databaseServices.getAllFavorites();
-      log(favTrackNames.toString());
-      emit(HomeLoaded(trackList: setFavoriteTracks(tracks, favTrackNames)));
+      emit(HomeLoaded(trackList: setFavoriteForTracks(tracks, favTrackNames)));
     });
     on<RenderPlayList>((event, emit) async {
+      List<String> favTrackNames = await databaseServices.getAllFavorites();
       List<Track> tracks =
           await databaseServices.getTracksFromPlayList(event.playListName);
-      emit(HomeLoaded(trackList: tracks));
+      emit(HomeLoaded(
+        trackList: setFavoriteForTracks(tracks, favTrackNames),
+        playList: event.playListName,
+      ));
     });
     on<Favorite>((event, emit) async {
+      List<String> favTrackNames = await databaseServices.getAllFavorites();
       if (event.isFavorite) {
-        await databaseServices.addTrackToFavorites(event.trackName);
+        databaseServices.addTrackToFavorites(event.trackName);
+        favTrackNames.add(event.trackName);
       } else {
-        await databaseServices.removeFromFavorite(event.trackName);
+        databaseServices.removeFromFavorite(event.trackName);
+        favTrackNames.remove(event.trackName);
       }
-      add(RenderTracksFromApp());
+      if (state.playList == "favorites") {
+        emit(HomeLoaded(
+          trackList: favoriteTracks(state.trackList, favTrackNames),
+          playList: state.playList,
+        ));
+      } else {
+        emit(HomeLoaded(
+          trackList: setFavoriteForTracks(state.trackList, favTrackNames),
+          playList: state.playList,
+        ));
+      }
     });
   }
 }
 
-List<Track> setFavoriteTracks(
-    List<Track> tracks, List<String> favoriteTrackNames) {
+///returns only [tracks] that marked favorite from [favoriteTrackNames].
+List<Track> favoriteTracks(
+  List<Track> tracks,
+  List<String> favoriteTrackNames,
+) {
+  return tracks
+      .where((element) => favoriteTrackNames.contains(element.trackName))
+      .toList();
+}
+
+///mark favorite for [tracks] that are in [favoriteTrackNames].
+List<Track> setFavoriteForTracks(
+  List<Track> tracks,
+  List<String> favoriteTrackNames,
+) {
   for (Track track in tracks) {
     if (favoriteTrackNames.contains(track.trackName)) {
       track.isFavorite = true;
+    } else {
+      track.isFavorite = false;
     }
   }
   return tracks;

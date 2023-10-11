@@ -34,11 +34,7 @@ class AudioList extends StatelessWidget {
             }
             context.read<AudioBloc>().add(
                   AudioInitEvent(
-                    tracks,
-                    MediaQuery.of(context).size.width,
-                    index,
-                    () {},
-                  ),
+                      tracks, index, MediaQuery.of(context).size.width, () {}),
                 );
           },
           child: AudioTale(

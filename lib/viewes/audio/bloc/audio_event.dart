@@ -5,11 +5,12 @@ sealed class AudioEvent {}
 
 final class AudioInitEvent extends AudioEvent {
   final List<Track> tracks;
+  final int currentIndex;
   final double width;
-  final int index;
+
   final void Function() onNavigate;
 
-  AudioInitEvent(this.tracks, this.width, this.index, this.onNavigate);
+  AudioInitEvent(this.tracks, this.currentIndex, this.width, this.onNavigate);
 }
 
 final class AudioEndEvent extends AudioEvent {
@@ -33,10 +34,10 @@ final class SwitchPlayerStateEvent extends AudioEvent {
 
 final class ChangeMusicEvent extends AudioEvent {
   final List<Track> tracks;
+  final int currentIndex;
   final double width;
-  final int index;
 
-  ChangeMusicEvent(this.width, this.tracks, this.index);
+  ChangeMusicEvent(this.tracks, this.currentIndex, this.width);
 }
 
 final class TotalDurationEvent extends AudioEvent {

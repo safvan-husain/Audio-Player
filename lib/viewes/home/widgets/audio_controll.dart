@@ -19,11 +19,7 @@ class AudioControl extends StatefulWidget {
 
 class _AudioControlState extends State<AudioControl> {
   bool isVisible = false;
-  late final Track track = context
-      .read<AudioBloc>()
-      .homeBloc
-      .state
-      .trackList[context.read<AudioBloc>().state.currentIndex];
+  late Track track;
   @override
   void initState() {
     Future.delayed(
@@ -37,6 +33,11 @@ class _AudioControlState extends State<AudioControl> {
 
   @override
   Widget build(BuildContext context) {
+    track = context
+        .read<AudioBloc>()
+        .state
+        .tracks
+        .elementAt(context.read<AudioBloc>().state.currentIndex);
     return Visibility(
       visible: isVisible,
       child: Positioned(
@@ -85,12 +86,7 @@ class _AudioControlState extends State<AudioControl> {
         children: [
           Flexible(
             child: Text(
-              context
-                  .read<AudioBloc>()
-                  .homeBloc
-                  .state
-                  .trackList[context.read<AudioBloc>().state.currentIndex]
-                  .trackName,
+              state.tracks.elementAt(state.currentIndex).trackName,
               style: Theme.of(context).textTheme.titleSmall,
             ),
           ),
@@ -117,11 +113,12 @@ class _AudioControlState extends State<AudioControl> {
                     child: BlocBuilder<HomeBloc, HomeState>(
                       buildWhen: (previous, current) => current is HomeLoaded,
                       builder: (context, homeState) {
-                        Track myTrack = homeState.trackList[state.currentIndex];
                         return InkWell(
                           onTap: () {},
                           child: Icon(
-                            myTrack.isFavorite
+                            state.tracks
+                                    .elementAt(state.currentIndex)
+                                    .isFavorite
                                 ? Icons.favorite
                                 : Icons.favorite_border,
                             color: Color.fromARGB(255, 240, 45, 58),

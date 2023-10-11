@@ -44,8 +44,6 @@ dependencies:
   rxdart: ^0.27.7
   google_fonts: ^4.0.4
   receive_sharing_intent: ^1.4.5
-  flutter_file_downloader: ^1.1.4
-  al_downloader: ^1.7.9
   webview_flutter: ^4.3.0
   http: ^0.13.4
   permission_handler:

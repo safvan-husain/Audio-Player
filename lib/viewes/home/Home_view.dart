@@ -80,6 +80,8 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     }
   }
 
+//build calls when the audio position change
+//attention need, fix.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,7 +130,6 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                         padding: const EdgeInsets.only(left: 20, right: 20),
                         child: BlocBuilder<HomeBloc, HomeState>(
                           builder: (ctx, state) {
-                            print(state.runtimeType);
                             return switch (state) {
                               HomeInitial() => const Center(
                                   child: CircularProgressIndicator(),
@@ -150,27 +151,6 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       ),
       drawerEdgeDragWidth: 0.0,
       drawer: const MyDrawer(),
-    );
-  }
-
-  Widget _buildController() {
-    Future.delayed(
-      const Duration(seconds: 1),
-      () {
-        setState(() => isVisible = true);
-      },
-    );
-    return Visibility(
-      visible: isVisible,
-      child: const Positioned(
-        bottom: 10,
-        left: 0,
-        right: 0,
-        child: Hero(
-          tag: 'heri',
-          child: AudioControl(),
-        ),
-      ),
     );
   }
 

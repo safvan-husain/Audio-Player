@@ -25,6 +25,7 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
           controller: null,
           currentIndex: 0,
           progressStream: BehaviorSubject<WaveformProgress>(),
+          tracks: [],
         )) {
     on<AudioInitEvent>((event, emit) async {
       if (state.controller == null) {
@@ -32,7 +33,7 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
         await _onControllerNull(emit, event);
       } else if (_isCurrentlyPlayingAndSelectedNotSame(event)) {
         //if the current audio is different from selected audio.
-        add(ChangeMusicEvent(event.width, event.tracks, event.index));
+        add(ChangeMusicEvent(event.tracks, event.currentIndex, event.width));
       }
       _listenToControllerAndEmitLoadedState(emit, event);
 
@@ -41,7 +42,7 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
       } else {
         //will update total duration on progress stream completion.
         _generateWaveForm(
-          event.tracks[event.index],
+          event.tracks.elementAt(event.currentIndex),
           state.progressStream,
         );
       }
@@ -56,6 +57,7 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
           totalDuration: Duration.zero,
           currentIndex: state.currentIndex,
           progressStream: state.progressStream,
+          tracks: state.tracks,
         ),
       );
     });
@@ -65,12 +67,13 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
         emit(_audioPlayerState(isPlaying: true));
       } else if (event.playerState == PlayerState.completed) {
         add(ChangeMusicEvent(
-          event.width,
-          homeBloc.state.trackList,
+          state.tracks,
+          state.currentIndex > state.tracks.length - 1
+              ? 0
+              : state.currentIndex + 2,
+          event.width, //need attention.
           //if the index exceed the length start from beggning.
-          state.currentIndex + 1 < homeBloc.state.trackList.length
-              ? state.currentIndex + 1
-              : 0,
+          //need to change
         ));
       } else {
         emit(_audioPlayerState(isPlaying: false));
@@ -99,14 +102,14 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
       add(AudioEndEvent());
       add(AudioInitEvent(
         event.tracks,
+        event.currentIndex,
         event.width,
-        event.index,
         () {},
       ));
     });
     on<AddTrackToFavorites>((event, emit) {
       DataBaseService().addTrackToFavorites(
-          homeBloc.state.trackList.elementAt(state.currentIndex).trackName);
+          state.tracks.elementAt(state.currentIndex).trackName);
     });
     on<RemoveTrackFromFavorites>((event, emit) {});
   }
@@ -153,6 +156,7 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
       totalDuration: state.totalDuration,
       currentIndex: state.currentIndex,
       progressStream: state.progressStream,
+      tracks: state.tracks,
     );
   }
 
@@ -163,6 +167,7 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
       totalDuration: totalDuration,
       currentIndex: state.currentIndex,
       progressStream: state.progressStream,
+      tracks: state.tracks,
     );
   }
 
@@ -174,6 +179,7 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
       totalDuration: state.totalDuration,
       currentIndex: state.currentIndex,
       progressStream: state.progressStream,
+      tracks: state.tracks,
     );
   }
 
@@ -185,6 +191,7 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
       totalDuration: state.totalDuration,
       currentIndex: state.currentIndex,
       progressStream: state.progressStream,
+      tracks: state.tracks,
     ));
     state.controller!.onPositionChanged.listen((Duration p) {
       add(AudioPositionChangedEvent(p));
@@ -201,17 +208,20 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
 
   void _updateTotalDuration(AudioInitEvent event) {
     if (state.totalDuration == Duration.zero) {
-      add(TotalDurationEvent(
-          event.tracks[event.index].waveformWrapper!.waveform.duration));
+      add(TotalDurationEvent(event.tracks
+          .elementAt(event.currentIndex)
+          .waveformWrapper!
+          .waveform
+          .duration));
     }
   }
 
   bool _isWaveFormAlreadyGeneratedForThisAudio(AudioInitEvent event) =>
-      event.tracks[event.index].waveformWrapper != null;
+      event.tracks.elementAt(state.currentIndex).waveformWrapper != null;
 
   bool _isCurrentlyPlayingAndSelectedNotSame(AudioInitEvent event) {
-    return homeBloc.state.trackList[state.currentIndex].trackName !=
-        event.tracks[event.index].trackName;
+    return (state.tracks.elementAt(state.currentIndex).trackName) !=
+        event.tracks.elementAt(event.currentIndex).trackName;
   }
 
   ///emit [AudioInitial] and set&play audio controller.
@@ -219,22 +229,12 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
       Emitter<AudioState> emit, AudioInitEvent event) async {
     emit(AudioInitial(
       controller: AudioPlayer(),
-      currentIndex: event.index,
+      currentIndex: event.currentIndex,
       progressStream: BehaviorSubject<WaveformProgress>(),
+      tracks: event.tracks,
     ));
-    log(event.tracks[event.index].trackName);
-    await state.controller!
-        .play(DeviceFileSource(event.tracks[event.index].trackUrl));
-  }
-}
-
-Future<void> getAlbumArt(String filePath) async {
-  const platform = const MethodChannel('com.example.app/album_art');
-  try {
-    final Uint8List result =
-        await platform.invokeMethod('getAlbumArt', {"filePath": filePath});
-    // Use the result (which is the album art data)
-  } on PlatformException catch (e) {
-    // Error handling
+    log('current ${state.currentIndex}, length: ${state.tracks.length}');
+    await state.controller!.play(
+        DeviceFileSource(state.tracks.elementAt(state.currentIndex).trackUrl));
   }
 }
