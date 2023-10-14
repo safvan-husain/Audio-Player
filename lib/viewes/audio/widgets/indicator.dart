@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:audio_player/services/track_model.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
@@ -34,8 +32,8 @@ class _IndicatorsState extends State<Indicators> {
   Widget build(BuildContext context) {
     return BlocBuilder<AudioBloc, AudioState>(
       buildWhen: (previous, current) =>
-          current.runtimeType == TotalDurationState ||
-          current.runtimeType == AudioPositionChangedState,
+          current.changeType == ChangeType.totalDuration ||
+          current.changeType == ChangeType.currentDuration,
       builder: (context, state) {
         return SizedBox(
           height: 100.h,

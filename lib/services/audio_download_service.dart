@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'package:audio_player/database/database_service.dart';
-import 'package:audio_player/utils/audio_model.dart';
 import 'package:http/http.dart' as http;
 
 class AudioDownloadService {

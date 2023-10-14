@@ -1,5 +1,6 @@
+import 'dart:math';
+
 import 'package:audio_player/services/track_model.dart';
-import 'package:audio_player/utils/audio_name.dart';
 import 'package:audio_player/viewes/audio/audio_view.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
@@ -61,6 +62,8 @@ class _AudioControlState extends State<AudioControl> {
                   height: 50.h,
                   child: BlocBuilder<AudioBloc, AudioState>(
                     builder: (context, state) {
+                      print(
+                          'state playing: ${state.isPlaying} : ${state.changeType}');
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -121,7 +124,7 @@ class _AudioControlState extends State<AudioControl> {
                                     .isFavorite
                                 ? Icons.favorite
                                 : Icons.favorite_border,
-                            color: Color.fromARGB(255, 240, 45, 58),
+                            color: const Color.fromARGB(255, 240, 45, 58),
                           ),
                         );
                       },

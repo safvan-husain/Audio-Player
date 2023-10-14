@@ -8,9 +8,9 @@ final class AudioInitEvent extends AudioEvent {
   final int currentIndex;
   final double width;
 
-  final void Function() onNavigate;
+  // final void Function() onNavigate;
 
-  AudioInitEvent(this.tracks, this.currentIndex, this.width, this.onNavigate);
+  AudioInitEvent(this.tracks, this.currentIndex, this.width);
 }
 
 final class AudioEndEvent extends AudioEvent {
@@ -48,3 +48,12 @@ final class TotalDurationEvent extends AudioEvent {
 final class AddTrackToFavorites extends AudioEvent {}
 
 final class RemoveTrackFromFavorites extends AudioEvent {}
+
+final class SwitchShuffle extends AudioEvent {}
+
+final class PlayListPlayerStateSwitch extends AudioEvent {
+  final List<Track> tracks;
+  final double width;
+
+  PlayListPlayerStateSwitch(this.tracks, this.width);
+}

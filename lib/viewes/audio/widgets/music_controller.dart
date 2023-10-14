@@ -1,11 +1,8 @@
-import 'package:audio_player/services/track_model.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:just_waveform/just_waveform.dart';
 
-import 'package:audio_player/utils/audio_model.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
 import 'package:audio_player/viewes/audio/widgets/waveform.dart';
 
@@ -16,21 +13,18 @@ class MusicController extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AudioBloc, AudioState>(
       buildWhen: (previous, current) =>
-          current is AudioLoadedState ||
-          current is AudioInitial ||
-          current is AudioPlayerStateChangedState,
+          current.changeType == ChangeType.trackLoaded ||
+          current.changeType == ChangeType.initial ||
+          current.changeType == ChangeType.playerState,
       builder: (context, state) {
-        return switch (state) {
-          AudioLoadedState(controller: var controller) ||
-          TotalDurationState(controller: var controller) ||
-          AudioPlayerStateChangedState(controller: var controller) ||
-          AudioPositionChangedState(controller: var controller) =>
-            controller != null
-                ? buildController(context, controller, state)
-                : const Text('contriller is null'),
-          _ => const Center(
-              child: CircularProgressIndicator(),
-            ),
+        print(state.changeType);
+        return switch (state.changeType) {
+          // ChangeType.initial => const Center(
+          //     child: CircularProgressIndicator(),
+          //   ),
+          _ => state.controller != null
+              ? buildController(context, state)
+              : const Text('contriller is null'),
         };
       },
     );
@@ -38,13 +32,12 @@ class MusicController extends StatelessWidget {
 
   Column buildController(
     BuildContext context,
-    AudioPlayer controller,
     AudioState state,
   ) {
     return Column(
       children: [
         if (state.tracks.elementAt(state.currentIndex).waveformWrapper == null)
-          _progressStreamBuilder(state, controller)
+          _progressStreamBuilder(state)
         else
           WaveFormControl(
             waveform: state.tracks
@@ -62,8 +55,7 @@ class MusicController extends StatelessWidget {
     );
   }
 
-  StreamBuilder<WaveformProgress> _progressStreamBuilder(
-      AudioState state, AudioPlayer? controller) {
+  StreamBuilder<WaveformProgress> _progressStreamBuilder(AudioState state) {
     return StreamBuilder<WaveformProgress>(
       stream: state.progressStream,
       builder: (context, snapshot) {
@@ -86,7 +78,7 @@ class MusicController extends StatelessWidget {
               style: Theme.of(context).textTheme.titleLarge,
             ),
           );
-        } else if (controller == null) {
+        } else if (state.controller == null) {
           //this might not suppose to be here.
           return const Center(
             child: Text('contriller iisn ull'),
@@ -100,7 +92,7 @@ class MusicController extends StatelessWidget {
 
           return WaveFormControl(
             waveform: waveform,
-            player: controller,
+            player: state.controller!,
             isPlaying: state.isPlaying,
             currentDuration: state.currentDuration,
             color: Theme.of(context).splashColor,
@@ -122,6 +114,7 @@ class MusicController extends StatelessWidget {
             const Icon(Icons.skip_previous_rounded),
             GestureDetector(
                 onTap: () {
+                  print(state.isPlaying);
                   context.read<AudioBloc>().add(SwitchPlayerStateEvent());
                 },
                 child: CircleAvatar(

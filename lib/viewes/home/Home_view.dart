@@ -10,8 +10,9 @@ import 'package:audio_player/viewes/drawer/drawer.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:audio_player/viewes/home/widgets/audio_controll.dart';
 import 'package:audio_player/viewes/home/widgets/audio_list.dart';
-import 'package:audio_player/viewes/drawer/drawer_widgets/play_list_view.dart';
-import 'package:audio_player/viewes/drawer/drawer_widgets/preferences.dart';
+import 'package:audio_player/viewes/home/widgets/play_list_header.dart';
+import 'package:audio_player/viewes/home/widgets/processing_download/pop_up_view.dart';
+import 'package:audio_player/viewes/playlist_pop_up_window/pop_up_route.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -61,7 +62,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      if (_isPaused) {
+      if (_isPaused && context.read<HomeBloc>().state.playList == "All") {
         //checking it was paused or not, because resumed called with init,
         //it result into calling twice RenderTracksFromDevice, and store tracks to storage twice.
         context.read<HomeBloc>().add(RenderTracksFromDevice());
@@ -97,53 +98,52 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
           },
           child: SizedBox(
             height: MediaQuery.of(context).size.height,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
+            child: Stack(
               children: [
-                SizedBox(
-                  height: 60.h,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      InkWell(
-                        onTap: () {
-                          _scaffoldKey.currentState!.openDrawer();
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20.w),
+                        height: 50.h,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            InkWell(
+                              onTap: () {
+                                _scaffoldKey.currentState!.openDrawer();
+                              },
+                              child: Icon(Icons.horizontal_split),
+                            ),
+                            const InkWell(
+                              child: Icon(Icons.search),
+                            ),
+                          ],
+                        ),
+                      ),
+                      BlocBuilder<HomeBloc, HomeState>(
+                        builder: (ctx, state) {
+                          return switch (state) {
+                            HomeInitial() => const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            _ => Column(
+                                children: [
+                                  if (state.playList != "All")
+                                    const PlayListHeader(),
+                                  AudioList(tracks: state.trackList)
+                                ],
+                              ),
+                          };
                         },
-                        child: const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Icon(Icons.abc),
-                        ),
-                      ),
-                      const InkWell(
-                        child: Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Icon(Icons.abc),
-                        ),
                       ),
                     ],
                   ),
                 ),
-                Flexible(
-                  child: Stack(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 20, right: 20),
-                        child: BlocBuilder<HomeBloc, HomeState>(
-                          builder: (ctx, state) {
-                            return switch (state) {
-                              HomeInitial() => const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                              _ => AudioList(tracks: state.trackList),
-                            };
-                          },
-                        ),
-                      ),
-                      if (context.watch<AudioBloc>().state.controller != null)
-                        const AudioControl()
-                    ],
-                  ),
-                ),
+                if (context.watch<AudioBloc>().state.controller != null)
+                  const AudioControl()
               ],
             ),
           ),

@@ -67,8 +67,8 @@ class FavouriteView extends StatelessWidget {
   }
 
   Row _builtAppBar() {
-    return Row(
-      children: const [
+    return const Row(
+      children: [
         Expanded(
           child: Align(
             alignment: Alignment.bottomLeft,

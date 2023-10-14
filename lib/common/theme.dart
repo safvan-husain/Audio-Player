@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class MyTheme {
@@ -30,13 +31,27 @@ class MyTheme {
       cardColor: const Color.fromARGB(255, 145, 151, 174),
       // cardColor: const Color.fromARGB(255, 240, 45, 58),
       textTheme: TextTheme(
-        titleSmall: GoogleFonts.poppins(
-            color: const Color.fromARGB(255, 39, 48, 67),
-            textStyle: const TextStyle(overflow: TextOverflow.ellipsis)),
-        titleMedium: GoogleFonts.poppins(
-          color: const Color.fromARGB(255, 145, 151, 174),
-        ),
-      ),
+          titleSmall: GoogleFonts.poppins(
+              color: const Color.fromARGB(255, 39, 48, 67),
+              textStyle: const TextStyle(overflow: TextOverflow.ellipsis)),
+          titleMedium: GoogleFonts.poppins(
+            color: const Color.fromARGB(255, 145, 151, 174),
+          ),
+          titleLarge: GoogleFonts.poppins(
+            color: const Color.fromARGB(255, 243, 240, 236),
+            textStyle:
+                TextStyle(overflow: TextOverflow.ellipsis, fontSize: 20.r),
+          ),
+          labelLarge: GoogleFonts.poppins(
+            color: const Color.fromARGB(255, 243, 240, 236),
+            textStyle:
+                TextStyle(overflow: TextOverflow.ellipsis, fontSize: 14.r),
+          ),
+          bodySmall: GoogleFonts.poppins(
+            color: const Color.fromARGB(255, 145, 151, 174),
+            textStyle:
+                TextStyle(overflow: TextOverflow.ellipsis, fontSize: 12.r),
+          )),
       iconTheme: const IconThemeData(
         color: Color.fromARGB(255, 145, 151, 174),
       ));

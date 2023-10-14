@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:audio_player/database/database_service.dart';
 import 'package:audio_player/services/track_model.dart';
-import 'package:audio_player/utils/audio_model.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
@@ -22,7 +20,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       late String jsonListTracks;
       if (await ensurePermissionGranted()) {
         try {
-          jsonListTracks = await platform.invokeMethod('getRandomNumber');
+          //need attention.
+          dynamic re = await platform.invokeMethod('getRandomNumber');
+          if (re is String) {
+            jsonListTracks = re;
+          } else {
+            print(re);
+            jsonListTracks = '';
+          }
         } on PlatformException catch (e) {
           print(e);
           jsonListTracks = '';

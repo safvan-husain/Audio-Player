@@ -1,7 +1,14 @@
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:audio_player/services/track_model.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:flutter_media_metadata/flutter_media_metadata.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AudioTale extends StatefulWidget {
   final Track track;
@@ -15,6 +22,13 @@ class AudioTale extends StatefulWidget {
 class _AudioTaleState extends State<AudioTale> {
   bool isFavorite = false;
 
+  Future<Metadata> extractTrackDetails() async {
+    final metadata = await MetadataRetriever.fromFile(
+      File(widget.track.trackUrl),
+    );
+    return metadata;
+  }
+
   @override
   Widget build(BuildContext context) {
     isFavorite = widget.track.isFavorite;
@@ -22,27 +36,41 @@ class _AudioTaleState extends State<AudioTale> {
       width: double.infinity,
       child: Row(
         children: [
-          Container(
-            height: 80,
-            width: 80,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-            ),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.all(Radius.circular(10)),
-              child: Image.asset(
-                'assets/images/pop2.jpeg',
-                fit: BoxFit.cover,
-              ),
+          SizedBox(
+            height: 80.r,
+            child: FutureBuilder(
+              future: extractTrackDetails(),
+              builder: (context, snp) {
+                if (snp.hasData) {
+                  if (snp.data!.albumArt != null) {
+                    return Image.memory(
+                      snp.data!.albumArt!,
+                      fit: BoxFit.fitHeight,
+                      gaplessPlayback: true,
+                    );
+                  }
+
+                  return Image.asset(
+                    'assets/images/pop2.jpeg',
+                    fit: BoxFit.cover,
+                  );
+                }
+                return Image.asset(
+                  'assets/images/pop2.jpeg',
+                  fit: BoxFit.cover,
+                );
+              },
             ),
           ),
           const SizedBox(width: 20),
           Expanded(
+            flex: 2,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  widget.track.trackName,
+                  cutString(widget.track.trackName),
+                  maxLines: 2,
                   style: const TextStyle(
                     fontSize: 15,
                     color: Colors.white,
@@ -75,6 +103,42 @@ class _AudioTaleState extends State<AudioTale> {
           )
         ],
       ),
+      // child: Container(
+      //   color: Colors.blueAccent,
+      //   // height: 80.r,
+      //   width: 80.w,
+      //   child: FutureBuilder(
+      //     future: extractTrackDetails(),
+      //     builder: (context, snp) {
+      //       if (snp.hasData) {
+      //         if (snp.data!.albumArt != null) {
+      //           return Container(
+      //             color: Colors.redAccent,
+      //             child: Image.memory(
+      //               snp.data!.albumArt!,
+      //               fit: BoxFit.fill,
+      //             ),
+      //           );
+      //         }
+      //         return Image.asset(
+      //           'assets/images/pop2.jpeg',
+      //           fit: BoxFit.cover,
+      //         );
+      //       }
+      //       return Image.asset(
+      //         'assets/images/pop2.jpeg',
+      //         fit: BoxFit.cover,
+      //       );
+      //     },
+      //   ),
+      // ),
     );
   }
+}
+
+String cutString(String input) {
+  RegExp regExp = RegExp(r'^[a-zA-Z0-9 ,]*');
+  Match? match = regExp.firstMatch(input);
+  String output = match?.group(0) ?? '';
+  return output.length < 10 ? input : output;
 }

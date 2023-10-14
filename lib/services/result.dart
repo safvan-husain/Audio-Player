@@ -35,7 +35,7 @@ class Result {
     );
   }
   static Future<Result> connectToApi(String url) async {
-    String apiUrl = 'https://api.akuari.my.id/downloader/youtube?link=' + url;
+    String apiUrl = 'https://api.akuari.my.id/downloader/youtube?link=$url';
     log(apiUrl);
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {

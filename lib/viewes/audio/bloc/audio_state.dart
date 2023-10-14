@@ -1,7 +1,18 @@
 part of 'audio_bloc.dart';
 
+enum ChangeType {
+  currentDuration,
+  totalDuration,
+  initial,
+  end,
+  playerState,
+  trackLoaded,
+  shuffle
+}
+
 // @immutable
-sealed class AudioState {
+class AudioState {
+  final ChangeType changeType;
   final int currentIndex;
   final List<Track> tracks;
 
@@ -10,80 +21,68 @@ sealed class AudioState {
   final Duration totalDuration;
   BehaviorSubject<WaveformProgress> progressStream;
   bool isPlaying;
+  bool isShuffling;
+
   AudioState({
+    required this.changeType,
     required this.controller,
     required this.currentDuration,
-    this.isPlaying = true,
+    required this.isPlaying,
     required this.totalDuration,
     required this.currentIndex,
     required this.progressStream,
     required this.tracks,
+    required this.isShuffling,
   });
-}
+  AudioState copyWith({
+    required ChangeType changeType,
+    AudioPlayer? controller,
+    Duration? currentDuration,
+    bool? isPlaying,
+    Duration? totalDuration,
+    int? currentIndex,
+    BehaviorSubject<WaveformProgress>? progressStream,
+    List<Track>? tracks,
+    bool? isShuffling,
+  }) {
+    return AudioState(
+      changeType: changeType,
+      controller: controller ?? this.controller,
+      currentDuration: currentDuration ?? this.currentDuration,
+      totalDuration: totalDuration ?? this.totalDuration,
+      currentIndex: currentIndex ?? this.currentIndex,
+      progressStream: progressStream ?? this.progressStream,
+      tracks: tracks ?? this.tracks,
+      isPlaying: isPlaying ?? this.isPlaying,
+      isShuffling: isShuffling ?? this.isShuffling,
+    );
+  }
 
-final class AudioInitial extends AudioState {
-  AudioInitial({
-    required super.controller,
-    super.currentDuration = Duration.zero,
-    super.totalDuration = Duration.zero,
-    required super.currentIndex,
-    required super.progressStream,
-    required super.tracks,
-  });
-}
+  AudioState end() {
+    return AudioState(
+      changeType: ChangeType.end,
+      controller: null,
+      currentDuration: Duration.zero,
+      isPlaying: false,
+      totalDuration: Duration.zero,
+      currentIndex: currentIndex,
+      progressStream: progressStream,
+      tracks: tracks,
+      isShuffling: isShuffling,
+    );
+  }
 
-final class AudioEndState extends AudioState {
-  AudioEndState({
-    required super.controller,
-    required super.currentDuration,
-    required super.totalDuration,
-    required super.currentIndex,
-    required super.progressStream,
-    required super.tracks,
-  });
-}
-
-final class AudioLoadedState extends AudioState {
-  AudioLoadedState({
-    required super.controller,
-    required super.currentDuration,
-    required super.totalDuration,
-    required super.currentIndex,
-    required super.progressStream,
-    required super.tracks,
-  });
-}
-
-final class AudioPositionChangedState extends AudioState {
-  AudioPositionChangedState({
-    required super.controller,
-    required super.currentDuration,
-    required super.totalDuration,
-    required super.currentIndex,
-    required super.progressStream,
-    required super.tracks,
-  });
-}
-
-final class AudioPlayerStateChangedState extends AudioState {
-  AudioPlayerStateChangedState({
-    required super.controller,
-    required super.isPlaying,
-    required super.currentDuration,
-    required super.totalDuration,
-    required super.currentIndex,
-    required super.progressStream,
-    required super.tracks,
-  });
-}
-
-final class TotalDurationState extends AudioState {
-  TotalDurationState({
-    required super.controller,
-    required super.currentDuration,
-    required super.totalDuration,
-    required super.currentIndex,
-    required super.progressStream,
-    required super.tracks,
-  });
+  factory AudioState.initial() {
+    return AudioState(
+      changeType: ChangeType.initial,
+      currentDuration: Duration.zero,
+      totalDuration: Duration.zero,
+      controller: null,
+      currentIndex: 0,
+      progressStream: BehaviorSubject<WaveformProgress>(),
+      tracks: [],
+      isPlaying: false,
+      isShuffling: true,
+    );
+  }
 }

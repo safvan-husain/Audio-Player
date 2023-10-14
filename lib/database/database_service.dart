@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:audio_player/services/track_model.dart';
-import 'package:audio_player/utils/audio_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:io' as io;
 import 'package:path/path.dart';
@@ -96,6 +95,15 @@ class DataBaseService {
   Future<List<Track>> getTracksFromPlayList(String playListName) async {
     var playlistId = await _db.query('Playlists',
         where: 'playlistName = ?', whereArgs: [playListName]);
+    if (playlistId.isEmpty) {
+      return [
+        Track(
+          trackDetail: "Safvan",
+          trackName: "Safvan's Speech",
+          trackUrl: '/',
+        )
+      ];
+    }
     var result = await _db.rawQuery(
         'SELECT * FROM Tracks INNER JOIN Playlist_Tracks ON Tracks.id = Playlist_Tracks.trackId WHERE Playlist_Tracks.playlistId = ?',
         [playlistId[0]['id']]);

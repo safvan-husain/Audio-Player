@@ -1,10 +1,5 @@
-import 'dart:developer';
 
-import 'package:audio_player/viewes/drawer/bloc/drawer_bloc.dart';
-import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Preferences extends StatelessWidget {
   const Preferences({super.key});

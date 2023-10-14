@@ -82,7 +82,15 @@ class MainActivity: FlutterActivity() {
                 val jsonString = Json.encodeToString(rand)
                 result.success(jsonString)
             } else {
-                result.success(-1)
+                if(rand == null) {
+                Log.v(mTAG, "rand is null")
+
+                }else {
+                     Log.v(mTAG, "rand is not null")
+                     Log.v(mTAG, Json.encodeToString(rand))
+
+                }
+                result.success("[]")
             }
         }
         else {

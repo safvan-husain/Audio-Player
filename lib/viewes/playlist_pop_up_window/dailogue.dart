@@ -37,7 +37,7 @@ class PlayListDailogue extends StatelessWidget {
                       _createTitileAndCancelIcon(context),
                       ..._buildPlayListBoxes(state.possiblePlaylists,
                           state.currentPlayLists, context),
-                      Divider(),
+                      const Divider(),
                       if (state is InputTextState)
                         _buildForInput(context)
                       else
@@ -158,8 +158,8 @@ class PlayListDailogue extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Flexible(
-          child: const Text(
+        const Flexible(
+          child: Text(
             'Save Track to...',
             maxLines: 1,
             style: TextStyle(

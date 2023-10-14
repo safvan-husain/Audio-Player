@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:developer' as d;
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -29,8 +28,8 @@ class WaveFormControl extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AudioBloc, AudioState>(
       buildWhen: (previous, current) =>
-          current.runtimeType == AudioPositionChangedState ||
-          current.runtimeType == AudioPlayerStateChangedState,
+          current.changeType == ChangeType.currentDuration ||
+          current.changeType == ChangeType.playerState,
       builder: (context, state) {
         return GestureDetector(
           onTapDown: (details) async {
@@ -52,7 +51,7 @@ class WaveFormControl extends StatelessWidget {
               state.controller!.resume();
             }
           },
-          child: Container(
+          child: SizedBox(
             height: 100.h,
             width: double.infinity,
             child: AudioWaveformWidget(

@@ -1,8 +1,6 @@
 import 'package:audio_player/common/theme.dart';
 import 'package:audio_player/database/database_service.dart';
-import 'package:audio_player/provider/audio_player_provider.dart';
 
-import 'package:audio_player/utils/audio_name.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
 import 'package:audio_player/viewes/drawer/bloc/drawer_bloc.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
@@ -45,7 +43,7 @@ class MyApp extends StatelessWidget {
           title: 'Flutter Demo',
           theme: MyTheme.light,
           darkTheme: MyTheme.dark,
-          home: HomeView(),
+          home: const HomeView(),
         );
       },
     );

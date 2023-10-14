@@ -1,12 +1,13 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'dart:developer';
-import 'package:audio_player/services/track_model.dart';
+
+import 'dart:io';
 
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
 import 'package:audio_player/viewes/audio/widgets/indicator.dart';
 import 'package:audio_player/viewes/audio/widgets/music_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_media_metadata/flutter_media_metadata.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AudioView extends StatelessWidget {
@@ -38,9 +39,9 @@ class AudioView extends StatelessWidget {
                 },
                 child: Padding(
                   padding: EdgeInsets.only(
-                    top: 80.h,
-                    left: 20.w,
-                    right: 20.w,
+                    top: 10.h,
+                    left: 10.w,
+                    right: 10.w,
                     bottom: 20.h,
                   ),
                   child: SizedBox(
@@ -51,13 +52,52 @@ class AudioView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Flexible(
-                            child: CircleAvatar(radius: 90.r),
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 20.w),
+                            height: 50.h,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                InkWell(
+                                  onTap: () {},
+                                  child: Icon(Icons.horizontal_split),
+                                ),
+                                const InkWell(
+                                  child: Icon(Icons.search),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            flex: 4,
+                            child: FutureBuilder(
+                              future: extractTrackDetails(state.tracks
+                                  .elementAt(state.currentIndex)
+                                  .trackUrl),
+                              builder: (context, snp) {
+                                if (snp.hasData) {
+                                  if (snp.data!.albumArt != null) {
+                                    return Image.memory(
+                                      snp.data!.albumArt!,
+                                      fit: BoxFit.cover,
+                                      gaplessPlayback: true,
+                                    );
+                                  }
+
+                                  return Image.asset(
+                                    'assets/images/pop2.jpeg',
+                                    fit: BoxFit.cover,
+                                  );
+                                }
+                                return Image.asset(
+                                  'assets/images/pop2.jpeg',
+                                  fit: BoxFit.cover,
+                                );
+                              },
+                            ),
                           ),
                           const Spacer(),
-                          const Flexible(
-                            child: Indicators(),
-                          ),
+                          Indicators(),
                           const MusicController()
                         ],
                       ),
@@ -71,4 +111,11 @@ class AudioView extends StatelessWidget {
       },
     );
   }
+}
+
+Future<Metadata> extractTrackDetails(String trackUrl) async {
+  final metadata = await MetadataRetriever.fromFile(
+    File(trackUrl),
+  );
+  return metadata;
 }

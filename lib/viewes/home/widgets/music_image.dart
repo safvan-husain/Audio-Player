@@ -73,8 +73,8 @@ class _MusicImageState extends State<MusicImage> {
                         ),
                       ),
                       const SizedBox(height: 5),
-                      Row(
-                        children: const [
+                      const Row(
+                        children: [
                           Icon(
                             Icons.music_note_rounded,
                             color: Colors.white,
