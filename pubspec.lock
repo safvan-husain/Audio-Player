@@ -129,6 +129,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+  custom_search_bar:
+    dependency: "direct main"
+    description:
+      name: custom_search_bar
+      sha256: "578f5f9b4acc9c017b177aa4643dd9541e8b4b027144e433879b2a6f8316ae07"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   dio:
     dependency: "direct main"
     description:
@@ -304,6 +312,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
+  marquee_text:
+    dependency: "direct main"
+    description:
+      name: marquee_text
+      sha256: "2f667fc3870af19b58ad5204e15d5f1627807585ed049800e48133601905554e"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.5.0+1"
   matcher:
     dependency: transitive
     description:

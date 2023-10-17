@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:audio_player/database/database_service.dart';
@@ -102,6 +103,7 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
         //if currently playing tracks are same, just toggle the player state.
         add(SwitchPlayerStateEvent());
       } else {
+        log('audio init event from playlist player state switch');
         add(AudioInitEvent(event.tracks, 0, event.width));
       }
     });
@@ -123,10 +125,8 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
       final waveFile = File(join(
           (await getTemporaryDirectory()).path, '${track.trackName}.wave'));
 
-      JustWaveform.extract(
-        audioInFile: audioFile,
-        waveOutFile: waveFile,
-      ).listen((data) {
+      JustWaveform.extract(audioInFile: audioFile, waveOutFile: waveFile)
+          .listen((data) {
         progressStream.add(data);
         if (data.waveform != null) {
           DataBaseService().storeWaveForm(
@@ -139,9 +139,13 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
               coverImage: track.coverImage,
             ),
             () {
-              //updating the tracklist, if not waveform warapper
+              //updating the tracklist, if not, waveform warapper
               //will be still null for this track in home state.
-              homeBloc.add(RenderTracksFromApp());
+              if (state is PlayListRendered) {
+                homeBloc.add(RenderPlayList(homeBloc.state.playLists[0]));
+              } else {
+                homeBloc.add(RenderTracksFromApp());
+              }
             },
           );
         }
@@ -172,7 +176,10 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
   }
 
   bool _isCurrentlyPlayingAndSelectedNotSame(AudioInitEvent event) {
+    //return true if currently playing and selected is not same
+    //or selected playlist and current playlist is not same.
     return (state.tracks.elementAt(state.currentIndex).trackName) !=
-        event.tracks.elementAt(event.currentIndex).trackName;
+            event.tracks.elementAt(event.currentIndex).trackName ||
+        state.tracks != event.tracks;
   }
 }

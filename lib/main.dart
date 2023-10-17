@@ -21,8 +21,8 @@ void main() async {
       providers: [
         BlocProvider<HomeBloc>(create: (ctx) => homeBloc),
         BlocProvider<AudioBloc>(create: (ctx) => AudioBloc(homeBloc)),
-        BlocProvider<PlayListWindowBloc>(create: (ctx) => PlayListWindowBloc()),
-        BlocProvider<DrawerBloc>(create: (ctx) => DrawerBloc(homeBloc)),
+        BlocProvider<PlayListWindowBloc>(
+            create: (ctx) => PlayListWindowBloc(homeBloc)),
       ],
       child: const MyApp(),
     ),

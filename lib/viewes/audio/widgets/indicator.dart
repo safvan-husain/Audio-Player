@@ -1,57 +1,38 @@
 import 'package:audio_player/services/track_model.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
-import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
-// import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
-import 'package:audio_player/viewes/playlist_pop_up_window/bloc/play_list_window_bloc.dart'
-    as s;
-import 'package:audio_player/viewes/playlist_pop_up_window/dailogue.dart';
-import 'package:audio_player/viewes/playlist_pop_up_window/pop_up_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:marquee_text/marquee_text.dart';
 
-class Indicators extends StatefulWidget {
-  const Indicators({super.key});
+class TrackTitle extends StatefulWidget {
+  const TrackTitle({super.key});
 
   @override
-  State<Indicators> createState() => _IndicatorsState();
+  State<TrackTitle> createState() => _TrackTitleState();
 }
 
-class _IndicatorsState extends State<Indicators> {
-  late final AudioBloc _audioBloc = context.read<AudioBloc>();
-  late final Track track =
-      _audioBloc.state.tracks.elementAt(_audioBloc.state.currentIndex);
-  bool isFavorite = false;
-  @override
-  void initState() {
-    isFavorite = track.isFavorite;
-    super.initState();
-  }
-
+class _TrackTitleState extends State<TrackTitle> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AudioBloc, AudioState>(
-      buildWhen: (previous, current) =>
-          current.changeType == ChangeType.totalDuration ||
-          current.changeType == ChangeType.currentDuration,
       builder: (context, state) {
+        Track track = state.tracks.elementAt(state.currentIndex);
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              cutString(track.trackName),
-              maxLines: 1,
-              overflow: TextOverflow.fade,
-              style: Theme.of(context).textTheme.titleLarge,
+            MarqueeText(
+              speed: 20,
+              text: TextSpan(
+                text: cutString(track.trackName),
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
             ),
             const SizedBox(height: 5),
             Text(
               track.trackDetail,
               maxLines: 1,
               overflow: TextOverflow.fade,
-              style: const TextStyle(
-                color: Colors.grey,
-              ),
+              style: Theme.of(context).textTheme.titleMedium,
             )
           ],
         );
@@ -79,5 +60,5 @@ String cutString(String input) {
   RegExp regExp = RegExp(r'^[a-zA-Z0-9 ,]*');
   Match? match = regExp.firstMatch(input);
   String output = match?.group(0) ?? '';
-  return output.length < 10 ? input : output;
+  return output.length < 10 ? input.trim() : output.trim();
 }

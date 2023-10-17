@@ -21,7 +21,7 @@ class MyTheme {
           900: Color(0xFFA3A3A3),
         },
       ),
-      primaryColorLight: const Color.fromARGB(224, 240, 45, 58),
+      primaryColorLight: const Color.fromARGB(223, 48, 56, 74),
       primaryColorDark: const Color.fromARGB(255, 131, 130, 128),
       canvasColor: const Color.fromARGB(255, 243, 240, 236),
       scaffoldBackgroundColor: const Color.fromARGB(224, 39, 48, 67),
@@ -37,10 +37,10 @@ class MyTheme {
           titleMedium: GoogleFonts.poppins(
             color: const Color.fromARGB(255, 145, 151, 174),
           ),
-          titleLarge: GoogleFonts.poppins(
+          titleLarge: GoogleFonts.russoOne(
             color: const Color.fromARGB(255, 243, 240, 236),
             textStyle:
-                TextStyle(overflow: TextOverflow.ellipsis, fontSize: 20.r),
+                TextStyle(overflow: TextOverflow.ellipsis, fontSize: 25.r),
           ),
           labelLarge: GoogleFonts.poppins(
             color: const Color.fromARGB(255, 243, 240, 236),
@@ -51,6 +51,11 @@ class MyTheme {
             color: const Color.fromARGB(255, 145, 151, 174),
             textStyle:
                 TextStyle(overflow: TextOverflow.ellipsis, fontSize: 12.r),
+          ),
+          displayLarge: GoogleFonts.poppins(
+            color: const Color.fromARGB(255, 253, 191, 6),
+            textStyle:
+                TextStyle(overflow: TextOverflow.ellipsis, fontSize: 16.r),
           )),
       iconTheme: const IconThemeData(
         color: Color.fromARGB(255, 145, 151, 174),

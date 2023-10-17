@@ -163,7 +163,14 @@ class MusicController extends StatelessWidget {
               ],
             ),
           ),
-          const Flexible(child: Icon(Icons.shuffle)),
+          Flexible(
+              child: InkWell(
+            onTap: () {
+              context.read<AudioBloc>().add(SwitchShuffle());
+            },
+            child: Icon(
+                state.isShuffling ? Icons.shuffle_on_outlined : Icons.shuffle),
+          )),
         ],
       ),
     );

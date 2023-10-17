@@ -32,7 +32,7 @@ class DownloadDailogue extends StatelessWidget {
                   children: [
                     Text(
                       'Warning',
-                      style: Theme.of(context).textTheme.bodyLarge,
+                      style: Theme.of(context).textTheme.displayLarge,
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 5.h),

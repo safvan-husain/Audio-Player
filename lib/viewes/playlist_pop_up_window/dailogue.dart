@@ -9,6 +9,14 @@ class PlayListDailogue extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      backgroundColor: Colors.transparent,
+      body: _buildPopUp(),
+    );
+  }
+
+  Center _buildPopUp() {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -70,6 +78,7 @@ class PlayListDailogue extends StatelessWidget {
               }
               // Navigator.of(context).pop();
             },
+            autofocus: true,
             decoration: const InputDecoration.collapsed(hintText: 'type here'),
             style: Theme.of(context).textTheme.titleSmall,
           ),

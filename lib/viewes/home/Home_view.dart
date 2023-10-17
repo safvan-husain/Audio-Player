@@ -4,15 +4,20 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:audio_player/common/icon_box.dart';
 import 'package:audio_player/services/audio_download_service.dart';
+import 'package:audio_player/services/track_model.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
 import 'package:audio_player/viewes/drawer/bloc/drawer_bloc.dart';
 import 'package:audio_player/viewes/drawer/drawer.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:audio_player/viewes/home/widgets/audio_controll.dart';
 import 'package:audio_player/viewes/home/widgets/audio_list.dart';
+import 'package:audio_player/viewes/home/widgets/audio_search_tile.dart';
+import 'package:audio_player/viewes/home/widgets/audio_tale.dart';
 import 'package:audio_player/viewes/home/widgets/play_list_header.dart';
+import 'package:audio_player/viewes/home/widgets/play_list_view.dart';
 import 'package:audio_player/viewes/home/widgets/processing_download/pop_up_view.dart';
 import 'package:audio_player/viewes/playlist_pop_up_window/pop_up_route.dart';
+import 'package:custom_search_bar/custom_search_bar.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -80,8 +85,9 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
         Navigator.of(context).pop();
         _isLauched = false;
       }
-      if (_isPaused && context.read<HomeBloc>().state.playList == "All") {
+      if (_isPaused && context.read<HomeBloc>().state.onHome) {
         //checking it was paused or not, because resumed called with init,
+        //and only need to refresh home if not in a playlist view.
         //it result into calling twice RenderTracksFromDevice, and store tracks to storage twice.
         context.read<HomeBloc>().add(RenderTracksFromDevice());
       }
@@ -109,10 +115,10 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       body: SafeArea(
         child: GestureDetector(
           onHorizontalDragEnd: (DragEndDetails details) {
-            if (details.velocity.pixelsPerSecond.dx > 0) {
-              context.read<DrawerBloc>().add(ListPlayLists());
-              _scaffoldKey.currentState?.openDrawer();
-            }
+            // if (details.velocity.pixelsPerSecond.dx > 0) {
+            //   context.read<DrawerBloc>().add(ListPlayLists());
+            //   _scaffoldKey.currentState?.openDrawer();
+            // }
           },
           child: SizedBox(
             height: MediaQuery.of(context).size.height,
@@ -120,48 +126,17 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
               children: [
                 SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 20.w),
-                        height: 50.h,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                _scaffoldKey.currentState!.openDrawer();
-                              },
-                              child: const Icon(Icons.horizontal_split),
-                            ),
-                            InkWell(
-                              onTap: () {
-                                Navigator.of(context)
-                                    .push(PopUpRoute(const DownloadDailogue()));
-                              },
-                              child: const Icon(Icons.search),
-                            ),
-                          ],
-                        ),
-                      ),
-                      BlocBuilder<HomeBloc, HomeState>(
-                        builder: (ctx, state) {
-                          return switch (state) {
-                            HomeInitial() => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            _ => Column(
-                                children: [
-                                  if (state.playList != "All")
-                                    const PlayListHeader(),
-                                  AudioList(tracks: state.trackList)
-                                ],
-                              ),
-                          };
-                        },
-                      ),
-                    ],
+                  child: BlocBuilder<HomeBloc, HomeState>(
+                    builder: (context, state) {
+                      return switch (state) {
+                        PlayListRendered(
+                          trackList: var trackList,
+                          playLists: var playLists,
+                        ) =>
+                          _buildPlayListPage(playLists, trackList),
+                        _ => _buildDefaultpage(context, state)
+                      };
+                    },
                   ),
                 ),
                 if (context.watch<AudioBloc>().state.controller != null)
@@ -171,40 +146,82 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
           ),
         ),
       ),
-      drawerEdgeDragWidth: 0.0,
-      drawer: MyDrawer(
-        closeDrawer: () => _scaffoldKey.currentState!.closeDrawer(),
+    );
+  }
+
+  WillPopScope _buildPlayListPage(
+      List<String> playLists, List<Track> trackList) {
+    return WillPopScope(
+      onWillPop: () async {
+        context.read<HomeBloc>().add(RenderTracksFromApp());
+        return false;
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildAppBar(context),
+          PlayListHeader(playListName: playLists[0]),
+          AudioList(tracks: trackList)
+        ],
       ),
     );
   }
 
-  Row builtSearchBar() {
-    return Row(
+  Column _buildDefaultpage(BuildContext context, HomeState state) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        const Expanded(
-          child: IconBox(icon: Icons.receipt),
-        ),
-        const SizedBox(
-          width: 20,
-        ),
-        Expanded(
-          flex: 5,
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 109, 92, 161),
-              borderRadius: BorderRadius.circular(10),
+        _buildAppBar(context),
+        switch (state) {
+          HomeInitial() => SizedBox(
+              height: MediaQuery.of(context).size.height - 50.h,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
             ),
-            width: 100,
-            height: 50,
-            child: const TextField(
-              decoration: InputDecoration(
-                  hintText: 'search',
-                  border: InputBorder.none,
-                  prefixIcon: Icon(Icons.search)),
+          _ => Column(
+              children: [
+                const PlayListView(),
+                // const PlayListHeader(),
+                AudioList(tracks: state.trackList)
+              ],
             ),
-          ),
-        )
+        },
       ],
+    );
+  }
+
+  Container _buildAppBar(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 20.w),
+      height: 50.h,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          InkWell(
+            onTap: () {},
+            child: const Icon(Icons.horizontal_split),
+          ),
+          BlocBuilder<HomeBloc, HomeState>(
+            builder: (context, state) {
+              return InkWell(
+                onTap: () => showSearchForCustomiseSearchDelegate<Track>(
+                  context: context,
+                  delegate: SearchScreen(
+                    items: state.trackList,
+                    filter: (track) => [track.trackName, track.trackDetail],
+                    itemBuilder: (t) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: AudioSearchTale(track: t),
+                    ),
+                  ),
+                ),
+                child: const Hero(tag: 'icon', child: Icon(Icons.search)),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 }

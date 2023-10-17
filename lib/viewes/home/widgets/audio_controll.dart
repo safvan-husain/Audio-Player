@@ -20,6 +20,7 @@ class AudioControl extends StatefulWidget {
 
 class _AudioControlState extends State<AudioControl> {
   bool isVisible = false;
+  bool isFavorite = false;
   late Track track;
   @override
   void initState() {
@@ -62,8 +63,6 @@ class _AudioControlState extends State<AudioControl> {
                   height: 50.h,
                   child: BlocBuilder<AudioBloc, AudioState>(
                     builder: (context, state) {
-                      print(
-                          'state playing: ${state.isPlaying} : ${state.changeType}');
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -83,6 +82,8 @@ class _AudioControlState extends State<AudioControl> {
   }
 
   Widget _buildNameAndButtons(BuildContext context, AudioState state) {
+    Track track = state.tracks.elementAt(state.currentIndex);
+
     return Flexible(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -113,21 +114,20 @@ class _AudioControlState extends State<AudioControl> {
                     ),
                   ),
                   Flexible(
-                    child: BlocBuilder<HomeBloc, HomeState>(
-                      buildWhen: (previous, current) => current is HomeLoaded,
-                      builder: (context, homeState) {
-                        return InkWell(
-                          onTap: () {},
-                          child: Icon(
-                            state.tracks
-                                    .elementAt(state.currentIndex)
-                                    .isFavorite
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            color: const Color.fromARGB(255, 240, 45, 58),
-                          ),
-                        );
+                    child: InkWell(
+                      onTap: () {
+                        context.read<HomeBloc>().add(Favorite(
+                            !state.tracks
+                                .elementAt(state.currentIndex)
+                                .isFavorite,
+                            track.trackName));
                       },
+                      child: Icon(
+                        state.tracks.elementAt(state.currentIndex).isFavorite
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        color: Theme.of(context).focusColor,
+                      ),
                     ),
                   ),
                 ],

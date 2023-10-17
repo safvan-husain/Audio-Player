@@ -7,6 +7,8 @@ final class RenderTracksFromDevice extends HomeEvent {}
 
 final class RenderTracksFromApp extends HomeEvent {}
 
+final class ListPlayLists extends HomeEvent {}
+
 final class RenderPlayList extends HomeEvent {
   final String playListName;
 

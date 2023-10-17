@@ -1,4 +1,5 @@
 import 'package:audio_player/database/database_service.dart';
+import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 
@@ -7,7 +8,8 @@ part 'play_list_window_state.dart';
 
 class PlayListWindowBloc
     extends Bloc<PlayListWindowEvent, PlayListWindowState> {
-  PlayListWindowBloc() : super(PlayListWindowInitial()) {
+  final HomeBloc _homeBloc;
+  PlayListWindowBloc(this._homeBloc) : super(PlayListWindowInitial()) {
     DataBaseService dataBaseService = DataBaseService();
     on<LoadPlayLists>((event, emit) async {
       List<String> possiblePlayLists =
@@ -31,6 +33,11 @@ class PlayListWindowBloc
 
     on<CreateNewPlayList>((event, emit) async {
       await dataBaseService.createPlayList(event.playListName);
+      _homeBloc.add(ListPlayLists());
+      await dataBaseService.addTrackToPlayList(
+        state.trackName,
+        event.playListName,
+      );
       emit(PlayListsLoadedState(
           trackName: state.trackName,
           possiblePlaylists: [...state.possiblePlaylists, event.playListName],

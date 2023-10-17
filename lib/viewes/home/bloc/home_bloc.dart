@@ -51,22 +51,22 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<RenderTracksFromApp>((event, emit) async {
       //used to render tracks from app storage.
       List<Track> tracks = await databaseServices.getAllTracks();
-      for (var track in tracks) {
-        print(track.trackDuration);
-      }
+      add(ListPlayLists());
       List<String> favTrackNames = await databaseServices.getAllFavorites();
-      emit(HomeLoaded(trackList: setFavoriteForTracks(tracks, favTrackNames)));
-    });
-
-    on<RenderPlayList>((event, emit) async {
-      List<String> favTrackNames = await databaseServices.getAllFavorites();
-      List<Track> tracks =
-          await databaseServices.getTracksFromPlayList(event.playListName);
       emit(HomeLoaded(
         trackList: setFavoriteForTracks(tracks, favTrackNames),
-        playList: event.playListName,
+        playLists: state.playLists,
       ));
     });
+
+    // on<RenderPlayList>((event, emit) async {
+    //   List<String> favTrackNames = await databaseServices.getAllFavorites();
+
+    //   emit(HomeLoaded(
+    //     trackList: setFavoriteForTracks(state.trackList, favTrackNames),
+    //     playLists: state.playLists,
+    //   ));
+    // });
 
     on<Favorite>((event, emit) async {
       List<String> favTrackNames = await databaseServices.getAllFavorites();
@@ -77,18 +77,35 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         databaseServices.removeFromFavorite(event.trackName);
         favTrackNames.remove(event.trackName);
       }
-      if (state.playList == "favorites") {
-        emit(HomeLoaded(
-          trackList: favoriteTracksOnly(state.trackList, favTrackNames),
-          playList: state.playList,
+      if (state.playLists.length==1 && state.playLists[0] == "favorites") {
+        emit(state.copyWith(
+          tracks: favoriteTracksOnly(state.trackList, favTrackNames),
+          playLists: state.playLists,
         ));
       } else {
-        emit(HomeLoaded(
-          trackList: setFavoriteForTracks(state.trackList, favTrackNames),
-          playList: state.playList,
+        emit(state.copyWith(
+          tracks: setFavoriteForTracks(state.trackList, favTrackNames),
+          playLists: state.playLists,
         ));
       }
     });
+    on<ListPlayLists>(
+      (event, emit) async {
+        List<String> playLists = await databaseServices.getAllPlayListName();
+        log('playLists event called ${playLists.toString()}');
+        emit(PlayListLoaded(trackList: state.trackList, playLists: playLists));
+      },
+    );
+    on<RenderPlayList>(
+      (event, emit) async {
+        List<String> favTrackNames = await databaseServices.getAllFavorites();
+        List<Track> tracks =
+            await databaseServices.getTracksFromPlayList(event.playListName);
+        emit(PlayListRendered(
+            trackList: setFavoriteForTracks(tracks, favTrackNames),
+            playLists: [event.playListName]));
+      },
+    );
   }
 }
 
@@ -126,7 +143,7 @@ Future<bool> _ensurePermissionGranted() async {
 }
 
 Future<Uint8List> _placeDefaultImage() async {
-  final ByteData bytes = await rootBundle.load('assets/images/pop2.jpeg');
+  final ByteData bytes = await rootBundle.load('assets/images/track.webp');
   final Uint8List list = bytes.buffer.asUint8List();
   return list;
 }

@@ -49,7 +49,7 @@ class Track {
   }
   factory Track.fromLocal(Map<String, dynamic> map, Uint8List coverImage) {
     return Track(
-      trackName: map['trackName'] as String,
+      trackName: map['trackName'].trim() as String,
       trackDetail: map['trackDetail'] as String,
       trackUrl: map['trackUrl'] as String,
       waveformWrapper: map['waveformWrapper'] == null

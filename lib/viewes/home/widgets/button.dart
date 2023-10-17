@@ -6,12 +6,14 @@ class Button extends StatelessWidget {
   final String label;
   final IconData icon;
   final void Function() onTap;
+  final bool isOn;
   // final bool value;
   const Button({
     Key? key,
     required this.label,
     required this.icon,
     required this.onTap,
+    required this.isOn,
     // required this.value,
   }) : super(key: key);
 
@@ -28,7 +30,9 @@ class Button extends StatelessWidget {
             height: 30.h,
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(10)),
-              color: Theme.of(context).cardColor,
+              color: isOn
+                  ? Theme.of(context).cardColor
+                  : Theme.of(context).focusColor,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -36,7 +40,7 @@ class Button extends StatelessWidget {
               children: [
                 Icon(
                   icon,
-                  color: Theme.of(context).focusColor,
+                  color: isOn ? Theme.of(context).focusColor : Colors.black,
                 ),
                 Text(
                   label,

@@ -53,6 +53,8 @@ dependencies:
   url_launcher: ^6.1.14
   flutter_media_metadata: ^1.0.0+1
   flutter_image_compress: ^2.0.4
+  marquee_text: ^2.5.0+1
+  custom_search_bar: ^0.0.3
 
 dev_dependencies:
   flutter_lints: ^2.0.0

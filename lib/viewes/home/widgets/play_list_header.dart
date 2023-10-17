@@ -6,7 +6,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PlayListHeader extends StatelessWidget {
-  const PlayListHeader({super.key});
+  final String playListName;
+  const PlayListHeader({super.key, required this.playListName});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +35,7 @@ class PlayListHeader extends StatelessWidget {
                         borderRadius:
                             const BorderRadius.all(Radius.circular(10)),
                         child: Image.asset(
-                          'assets/images/pop2.jpeg',
+                          'assets/images/track.webp',
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -50,7 +51,7 @@ class PlayListHeader extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              state.playList,
+                              playListName,
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             Text(
@@ -79,6 +80,8 @@ class PlayListHeader extends StatelessWidget {
                     return Row(
                       children: [
                         Button(
+                          isOn: audioState.isPlaying &&
+                              audioState.tracks == state.trackList,
                           //show playing if the tracklist on both same.
                           label: audioState.isPlaying &&
                                   audioState.tracks == state.trackList
@@ -99,6 +102,7 @@ class PlayListHeader extends StatelessWidget {
                         ),
                         SizedBox(width: 10.r),
                         Button(
+                          isOn: audioState.isShuffling,
                           label: 'shuffle',
                           icon: Icons.shuffle,
                           onTap: () {

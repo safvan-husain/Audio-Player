@@ -4,6 +4,7 @@ import 'package:audio_player/services/track_model.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
 import 'package:audio_player/viewes/audio/widgets/indicator.dart';
 import 'package:audio_player/viewes/audio/widgets/music_controller.dart';
+import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -29,6 +30,7 @@ class AudioView extends StatelessWidget {
             return true;
           },
           child: Scaffold(
+            resizeToAvoidBottomInset: false,
             body: SafeArea(
               child: GestureDetector(
                 onVerticalDragEnd: (details) {
@@ -50,6 +52,7 @@ class AudioView extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -67,14 +70,26 @@ class AudioView extends StatelessWidget {
                                     ),
                                   ),
                                   Flexible(
-                                      child: InkWell(
-                                    onTap: () {},
-                                    child: Icon(
-                                      track.isFavorite
-                                          ? Icons.favorite
-                                          : Icons.favorite_outline,
-                                      color: Theme.of(context).cardColor,
-                                    ),
+                                      child: BlocBuilder<HomeBloc, HomeState>(
+                                    builder: (context, homeState) {
+                                      return InkWell(
+                                        onTap: () {
+                                          context.read<HomeBloc>().add(Favorite(
+                                              !state.tracks
+                                                  .elementAt(state.currentIndex)
+                                                  .isFavorite,
+                                              track.trackName));
+                                        },
+                                        child: Icon(
+                                          state.tracks
+                                                  .elementAt(state.currentIndex)
+                                                  .isFavorite
+                                              ? Icons.favorite
+                                              : Icons.favorite_outline,
+                                          color: Theme.of(context).cardColor,
+                                        ),
+                                      );
+                                    },
                                   )),
                                 ],
                               ),
@@ -87,7 +102,7 @@ class AudioView extends StatelessWidget {
                                 .coverImage),
                           ),
                           const Spacer(),
-                          const Indicators(),
+                          const TrackTitle(),
                           const SizedBox(height: 15),
                           const MusicController(),
                           const SizedBox(height: 15),
