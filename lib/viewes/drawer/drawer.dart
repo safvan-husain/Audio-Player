@@ -1,11 +1,15 @@
-import 'package:audio_player/viewes/drawer/drawer_widgets/play_list_view.dart';
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:audio_player/viewes/drawer/drawer_widgets/play_list_view.dart';
+
 class MyDrawer extends StatelessWidget {
+  final void Function() closeDrawer;
   const MyDrawer({
-    super.key,
-  });
+    Key? key,
+    required this.closeDrawer,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +21,7 @@ class MyDrawer extends StatelessWidget {
         child: ListView(
           children: [
             SizedBox(height: 10.h),
-            const PlayListView(),
+            PlayListView(closeDrawer),
             SizedBox(height: 10.h),
             // Preferences(),
           ],

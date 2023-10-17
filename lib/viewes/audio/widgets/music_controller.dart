@@ -1,3 +1,7 @@
+import 'package:audio_player/services/track_model.dart';
+import 'package:audio_player/viewes/home/widgets/processing_download/pop_up_route.dart';
+import 'package:audio_player/viewes/playlist_pop_up_window/bloc/play_list_window_bloc.dart';
+import 'package:audio_player/viewes/playlist_pop_up_window/dailogue.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,20 +16,11 @@ class MusicController extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AudioBloc, AudioState>(
-      buildWhen: (previous, current) =>
-          current.changeType == ChangeType.trackLoaded ||
-          current.changeType == ChangeType.initial ||
-          current.changeType == ChangeType.playerState,
       builder: (context, state) {
-        print(state.changeType);
-        return switch (state.changeType) {
-          // ChangeType.initial => const Center(
-          //     child: CircularProgressIndicator(),
-          //   ),
-          _ => state.controller != null
-              ? buildController(context, state)
-              : const Text('contriller is null'),
-        };
+        if (state.controller == null) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        return buildController(context, state);
       },
     );
   }
@@ -35,6 +30,7 @@ class MusicController extends StatelessWidget {
     AudioState state,
   ) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         if (state.tracks.elementAt(state.currentIndex).waveformWrapper == null)
           _progressStreamBuilder(state)
@@ -50,6 +46,25 @@ class MusicController extends StatelessWidget {
             color: Theme.of(context).splashColor,
             backgroundColor: Theme.of(context).focusColor,
           ),
+        Flexible(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                  child: Text(
+                formatDuration(state.currentDuration),
+                style: Theme.of(context).textTheme.titleMedium,
+              )),
+              Flexible(
+                  child: Text(
+                formatDuration(
+                    state.tracks.elementAt(state.currentIndex).trackDuration),
+                style: Theme.of(context).textTheme.titleMedium,
+              )),
+            ],
+          ),
+        ),
+        SizedBox(height: 10.h),
         _buildController(context, state),
       ],
     );
@@ -78,18 +93,7 @@ class MusicController extends StatelessWidget {
               style: Theme.of(context).textTheme.titleLarge,
             ),
           );
-        } else if (state.controller == null) {
-          //this might not suppose to be here.
-          return const Center(
-            child: Text('contriller iisn ull'),
-          );
         } else {
-          if (state.totalDuration == Duration.zero) {
-            context
-                .read<AudioBloc>()
-                .add(TotalDurationEvent(waveform.duration));
-          }
-
           return WaveFormControl(
             waveform: waveform,
             player: state.controller!,
@@ -104,39 +108,79 @@ class MusicController extends StatelessWidget {
   }
 
   Widget _buildController(BuildContext context, AudioState state) {
+    double width = MediaQuery.of(context).size.width;
+    Track track = state.tracks.elementAt(state.currentIndex);
     return Material(
       color: Colors.transparent,
-      child: SizedBox(
-        width: 150.w,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Icon(Icons.skip_previous_rounded),
-            GestureDetector(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Flexible(
+            child: InkWell(
                 onTap: () {
-                  print(state.isPlaying);
-                  context.read<AudioBloc>().add(SwitchPlayerStateEvent());
+                  String trackName = track.trackName;
+                  context
+                      .read<PlayListWindowBloc>()
+                      .add(LoadPlayLists(trackName, () {
+                        Navigator.of(context).push(
+                          PopUpRoute(PlayListDailogue(trackName)),
+                        );
+                      }));
                 },
-                child: CircleAvatar(
-                  radius: 25.r,
-                  backgroundColor: Theme.of(context).splashColor,
-                  child: Icon(state.isPlaying ? Icons.pause : Icons.play_arrow),
-                )),
-            InkWell(
-                onTap: () {
-                  context.read<AudioBloc>().add(ChangeMusicEvent(
-                        state.tracks,
-                        //if the index exceed the length start from beggning.
-                        state.currentIndex > state.tracks.length - 2
-                            ? 0
-                            : state.currentIndex + 1,
-                        MediaQuery.of(context).size.width,
-                      ));
-                },
-                child: const Icon(Icons.skip_next_rounded)),
-          ],
-        ),
+                child: const Icon(Icons.playlist_add)),
+          ),
+          SizedBox(
+            width: 150.w,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                InkWell(
+                  onTap: () {
+                    context
+                        .read<AudioBloc>()
+                        .add(ChangeMusicEvent.previous(state, width));
+                  },
+                  child: const Icon(Icons.skip_previous_rounded),
+                ),
+                GestureDetector(
+                    onTap: () {
+                      context.read<AudioBloc>().add(SwitchPlayerStateEvent());
+                    },
+                    child: CircleAvatar(
+                      radius: 25.r,
+                      backgroundColor: Theme.of(context).splashColor,
+                      child: Icon(
+                          state.isPlaying ? Icons.pause : Icons.play_arrow),
+                    )),
+                InkWell(
+                  onTap: () {
+                    context
+                        .read<AudioBloc>()
+                        .add(ChangeMusicEvent.next(state, width));
+                  },
+                  child: const Icon(Icons.skip_next_rounded),
+                ),
+              ],
+            ),
+          ),
+          const Flexible(child: Icon(Icons.shuffle)),
+        ],
       ),
     );
+  }
+}
+
+String formatDuration(Duration d) {
+  String twoDigits(int n) {
+    if (n >= 10) return "$n";
+    return "0$n";
+  }
+
+  String twoDigitMinutes = twoDigits(d.inMinutes.remainder(60));
+  String twoDigitSeconds = twoDigits(d.inSeconds.remainder(60));
+  if (d.inHours == 0) {
+    return "$twoDigitMinutes:$twoDigitSeconds";
+  } else {
+    return "${twoDigits(d.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
 }

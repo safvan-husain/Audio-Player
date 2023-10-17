@@ -1,8 +1,6 @@
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:audio_player/viewes/home/widgets/button.dart';
-import 'package:audio_player/viewes/home/widgets/processing_download/pop_up_route.dart';
-import 'package:audio_player/viewes/home/widgets/processing_download/pop_up_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -18,6 +16,9 @@ class PlayListHeader extends StatelessWidget {
       width: MediaQuery.of(context).size.width,
       child: BlocBuilder<HomeBloc, HomeState>(
         builder: (context, state) {
+          int numberOfSongs = state.trackList.length;
+          int totalDuration = state.trackList.fold<int>(0,
+              (value, element) => value + element.trackDuration.inMilliseconds);
           return Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -26,21 +27,15 @@ class PlayListHeader extends StatelessWidget {
                 // height: 150.h,
                 child: Row(
                   children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.of(context)
-                            .push(PopUpRoute(const DownloadDailogue()));
-                      },
-                      child: SizedBox(
-                        height: 120.r,
-                        width: 120.r,
-                        child: ClipRRect(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(10)),
-                          child: Image.asset(
-                            'assets/images/pop2.jpeg',
-                            fit: BoxFit.cover,
-                          ),
+                    SizedBox(
+                      height: 120.r,
+                      width: 120.r,
+                      child: ClipRRect(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(10)),
+                        child: Image.asset(
+                          'assets/images/pop2.jpeg',
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
@@ -59,7 +54,7 @@ class PlayListHeader extends StatelessWidget {
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             Text(
-                              '${state.trackList.length} ${state.trackList.length > 1 ? "songs" : "song"} : 6 hour 50 miniutres',
+                              '$numberOfSongs ${numberOfSongs > 1 ? "audios" : "audio"} : ${formatDuration(totalDuration)}',
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                             Row(
@@ -121,4 +116,19 @@ class PlayListHeader extends StatelessWidget {
       ),
     );
   }
+}
+
+String formatDuration(int milliseconds) {
+  var d = Duration(milliseconds: milliseconds);
+  String twoDigits(int n) {
+    if (n >= 10) return "$n";
+    return "0$n";
+  }
+
+  String twoDigitMinutes = twoDigits(d.inMinutes.remainder(60));
+  if (d.inHours == 0) {
+    return "$twoDigitMinutes minutes";
+  }
+  // String twoDigitSeconds = twoDigits(d.inSeconds.remainder(60));
+  return "${d.inHours} hour $twoDigitMinutes minutes";
 }

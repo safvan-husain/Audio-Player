@@ -1,13 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
-import 'dart:io';
-
+import 'package:audio_player/services/track_model.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
 import 'package:audio_player/viewes/audio/widgets/indicator.dart';
 import 'package:audio_player/viewes/audio/widgets/music_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_media_metadata/flutter_media_metadata.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AudioView extends StatelessWidget {
@@ -17,16 +15,17 @@ class AudioView extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AudioBloc, AudioState>(
       buildWhen: (previous, current) {
+        if (current.changeType == ChangeType.initial) {
+          return true;
+        }
         return false;
       },
       builder: (context, state) {
+        Track track = state.tracks.elementAt(state.currentIndex);
         return WillPopScope(
           onWillPop: () async {
-            try {
-              context.read<AudioBloc>().add(AudioEndEvent());
-            } catch (e) {
-              throw ('Exception thrown: $e');
-            }
+            context.read<AudioBloc>().add(AudioEndEvent());
+
             return true;
           },
           child: Scaffold(
@@ -55,50 +54,43 @@ class AudioView extends StatelessWidget {
                           Container(
                             padding: EdgeInsets.symmetric(horizontal: 20.w),
                             height: 50.h,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                InkWell(
-                                  onTap: () {},
-                                  child: Icon(Icons.horizontal_split),
-                                ),
-                                const InkWell(
-                                  child: Icon(Icons.search),
-                                ),
-                              ],
+                            child: Material(
+                              color: Colors.transparent,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Flexible(
+                                    child: InkWell(
+                                      onTap: () {},
+                                      child: const Icon(Icons.horizontal_split),
+                                    ),
+                                  ),
+                                  Flexible(
+                                      child: InkWell(
+                                    onTap: () {},
+                                    child: Icon(
+                                      track.isFavorite
+                                          ? Icons.favorite
+                                          : Icons.favorite_outline,
+                                      color: Theme.of(context).cardColor,
+                                    ),
+                                  )),
+                                ],
+                              ),
                             ),
                           ),
                           Expanded(
                             flex: 4,
-                            child: FutureBuilder(
-                              future: extractTrackDetails(state.tracks
-                                  .elementAt(state.currentIndex)
-                                  .trackUrl),
-                              builder: (context, snp) {
-                                if (snp.hasData) {
-                                  if (snp.data!.albumArt != null) {
-                                    return Image.memory(
-                                      snp.data!.albumArt!,
-                                      fit: BoxFit.cover,
-                                      gaplessPlayback: true,
-                                    );
-                                  }
-
-                                  return Image.asset(
-                                    'assets/images/pop2.jpeg',
-                                    fit: BoxFit.cover,
-                                  );
-                                }
-                                return Image.asset(
-                                  'assets/images/pop2.jpeg',
-                                  fit: BoxFit.cover,
-                                );
-                              },
-                            ),
+                            child: Image.memory(state.tracks
+                                .elementAt(state.currentIndex)
+                                .coverImage),
                           ),
                           const Spacer(),
-                          Indicators(),
-                          const MusicController()
+                          const Indicators(),
+                          const SizedBox(height: 15),
+                          const MusicController(),
+                          const SizedBox(height: 15),
                         ],
                       ),
                     ),
@@ -111,11 +103,4 @@ class AudioView extends StatelessWidget {
       },
     );
   }
-}
-
-Future<Metadata> extractTrackDetails(String trackUrl) async {
-  final metadata = await MetadataRetriever.fromFile(
-    File(trackUrl),
-  );
-  return metadata;
 }

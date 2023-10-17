@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
 
 import 'package:audio_player/database/database_service.dart';
 import 'package:audio_player/services/track_model.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_media_metadata/flutter_media_metadata.dart';
 import 'package:meta/meta.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -11,34 +14,32 @@ part 'home_event.dart';
 part 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  static const platform = MethodChannel('example.com/channel');
+  static const platform = MethodChannel("example.com/channel");
   HomeBloc() : super(HomeInitial()) {
     var databaseServices = DataBaseService();
     on<RenderTracksFromDevice>((event, emit) async {
       add(RenderTracksFromApp());
       List<Track> tracks = [];
       late String jsonListTracks;
-      if (await ensurePermissionGranted()) {
+      if (await _ensurePermissionGranted()) {
         try {
-          //need attention.
-          dynamic re = await platform.invokeMethod('getRandomNumber');
-          if (re is String) {
-            jsonListTracks = re;
-          } else {
-            print(re);
-            jsonListTracks = '';
-          }
+          //extracting all the tracks from internal and external storage
+          //using android mediastore.
+          jsonListTracks = await platform.invokeMethod("getRandomNumber");
         } on PlatformException catch (e) {
           print(e);
           jsonListTracks = '';
         }
         List trackList = jsonDecode(jsonListTracks);
-        if (trackList.isNotEmpty) {
-          for (var element in trackList) {
-            tracks.add(Track.fromMap(element));
-          }
+
+        for (var element in trackList) {
+          Uint8List coverImage =
+              await _extractTrackCoverImage(element['trackUrl']) ??
+                  await _placeDefaultImage();
+          tracks.add(Track.fromLocal(element, coverImage));
         }
       } else {
+        //show message that permission would need.
         throw ('Permission denied');
       }
       for (var track in tracks) {
@@ -46,11 +47,17 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       }
       add(RenderTracksFromApp());
     });
+
     on<RenderTracksFromApp>((event, emit) async {
+      //used to render tracks from app storage.
       List<Track> tracks = await databaseServices.getAllTracks();
+      for (var track in tracks) {
+        print(track.trackDuration);
+      }
       List<String> favTrackNames = await databaseServices.getAllFavorites();
       emit(HomeLoaded(trackList: setFavoriteForTracks(tracks, favTrackNames)));
     });
+
     on<RenderPlayList>((event, emit) async {
       List<String> favTrackNames = await databaseServices.getAllFavorites();
       List<Track> tracks =
@@ -60,6 +67,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         playList: event.playListName,
       ));
     });
+
     on<Favorite>((event, emit) async {
       List<String> favTrackNames = await databaseServices.getAllFavorites();
       if (event.isFavorite) {
@@ -71,7 +79,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       }
       if (state.playList == "favorites") {
         emit(HomeLoaded(
-          trackList: favoriteTracks(state.trackList, favTrackNames),
+          trackList: favoriteTracksOnly(state.trackList, favTrackNames),
           playList: state.playList,
         ));
       } else {
@@ -85,7 +93,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 }
 
 ///returns only [tracks] that marked favorite from [favoriteTrackNames].
-List<Track> favoriteTracks(
+List<Track> favoriteTracksOnly(
   List<Track> tracks,
   List<String> favoriteTrackNames,
 ) {
@@ -109,10 +117,23 @@ List<Track> setFavoriteForTracks(
   return tracks;
 }
 
-Future<bool> ensurePermissionGranted() async {
+Future<bool> _ensurePermissionGranted() async {
   PermissionStatus status = await Permission.storage.status;
   if (!status.isGranted) {
     status = await Permission.storage.request();
   }
   return status.isGranted;
+}
+
+Future<Uint8List> _placeDefaultImage() async {
+  final ByteData bytes = await rootBundle.load('assets/images/pop2.jpeg');
+  final Uint8List list = bytes.buffer.asUint8List();
+  return list;
+}
+
+Future<Uint8List?> _extractTrackCoverImage(String trackUrl) async {
+  final metadata = await MetadataRetriever.fromFile(
+    File(trackUrl),
+  );
+  return metadata.albumArt;
 }

@@ -20,11 +20,10 @@ class DrawerBloc extends Bloc<DrawerEvent, DrawerState> {
         ));
       },
     );
+
     on<ListPlayLists>(
       (event, emit) async {
-        log('list play lists');
         List<String> playLists = await databaseServices.getAllPlayListName();
-        print(playLists);
         emit(DrawerStateChange(
           playLists: playLists,
           isPlayListExtended: !state.isPlayListExtended,

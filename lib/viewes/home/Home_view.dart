@@ -32,6 +32,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool isVisible = false;
   bool _isPaused = false;
+  bool _isLauched = false;
 
   @override
   void initState() {
@@ -39,11 +40,17 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     context.read<HomeBloc>().add(RenderTracksFromDevice());
 
     ReceiveSharingIntent.getTextStream().listen((String value) async {
-      log(value);
-
-      AudioDownloadService().fetchData(value, (url) async {
-        _launchInBrowser(Uri.parse(url));
-      });
+      Navigator.of(context).push(PopUpRoute(const DownloadDailogue()));
+      AudioDownloadService().fetchData(
+        value,
+        (url) async {
+          _isLauched = true;
+          _launchInBrowser(Uri.parse(url));
+        },
+        () {
+          Navigator.of(context).pop();
+        },
+      );
     }, onError: (err) {
       throw ("getLinkStream error: $err");
     });
@@ -51,9 +58,16 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     // For sharing or opening urls/text coming from outside the app while the app is closed
     ReceiveSharingIntent.getInitialText().then((String? value) {
       if (value != null) {
-        AudioDownloadService().fetchData(value, (url) async {
-          _launchInBrowser(Uri.parse(url));
-        });
+        AudioDownloadService().fetchData(
+          value,
+          (url) async {
+            _isLauched = true;
+            _launchInBrowser(Uri.parse(url));
+          },
+          () {
+            Navigator.of(context).pop();
+          },
+        );
       }
     });
     super.initState();
@@ -62,6 +76,10 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
+      if (_isLauched) {
+        Navigator.of(context).pop();
+        _isLauched = false;
+      }
       if (_isPaused && context.read<HomeBloc>().state.playList == "All") {
         //checking it was paused or not, because resumed called with init,
         //it result into calling twice RenderTracksFromDevice, and store tracks to storage twice.
@@ -115,10 +133,14 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                               onTap: () {
                                 _scaffoldKey.currentState!.openDrawer();
                               },
-                              child: Icon(Icons.horizontal_split),
+                              child: const Icon(Icons.horizontal_split),
                             ),
-                            const InkWell(
-                              child: Icon(Icons.search),
+                            InkWell(
+                              onTap: () {
+                                Navigator.of(context)
+                                    .push(PopUpRoute(const DownloadDailogue()));
+                              },
+                              child: const Icon(Icons.search),
                             ),
                           ],
                         ),
@@ -150,7 +172,9 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
         ),
       ),
       drawerEdgeDragWidth: 0.0,
-      drawer: const MyDrawer(),
+      drawer: MyDrawer(
+        closeDrawer: () => _scaffoldKey.currentState!.closeDrawer(),
+      ),
     );
   }
 

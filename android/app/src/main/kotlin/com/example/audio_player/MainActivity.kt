@@ -14,11 +14,13 @@ import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
 
+
 @Serializable
 data class AudioModel(
     var trackName: String? = null,
     var trackDetail: String? = null,
-    var trackUrl: String? = null
+    var trackUrl: String? = null,
+    var trackDuration: Long? = null,
 )
 
 private const val mTAG = "MainActivity"
@@ -30,6 +32,8 @@ fun getAllAudioFromDevice(context: Context): List<AudioModel>? {
         MediaStore.Audio.AudioColumns.DATA,
         MediaStore.Audio.AudioColumns.TITLE,
         MediaStore.Audio.ArtistColumns.ARTIST,
+        MediaStore.Audio.Media.DURATION, // Add this line
+        MediaStore.Audio.Media.ALBUM_ID
     )
     val selection = MediaStore.Audio.Media.IS_MUSIC + " != 0"
     /*val projection = arrayOf(
@@ -49,9 +53,15 @@ fun getAllAudioFromDevice(context: Context): List<AudioModel>? {
             val path = c.getString(0)
             val name = c.getString(1)
             val artist = c.getString(2)
+             val duration = c.getLong(3) // Add this line
+            val albumId = c.getString(4) // And this line
+           
+
             audioModel.trackName = name
             audioModel.trackDetail = artist
             audioModel.trackUrl = path
+            audioModel.trackDuration = duration
+
             if(path != null && (path.endsWith(".aac")
                         || path.endsWith(".mp3")
                         || path.endsWith(".wav")

@@ -8,8 +8,6 @@ final class AudioInitEvent extends AudioEvent {
   final int currentIndex;
   final double width;
 
-  // final void Function() onNavigate;
-
   AudioInitEvent(this.tracks, this.currentIndex, this.width);
 }
 
@@ -38,6 +36,26 @@ final class ChangeMusicEvent extends AudioEvent {
   final double width;
 
   ChangeMusicEvent(this.tracks, this.currentIndex, this.width);
+
+  factory ChangeMusicEvent.next(AudioState state, double width) {
+    return ChangeMusicEvent(
+        state.tracks,
+        //if the length exceed start from 0.
+        state.tracks.length - 1 > state.currentIndex
+            ? state.currentIndex + 1
+            : 0,
+        width);
+  }
+
+  factory ChangeMusicEvent.previous(AudioState state, double width) {
+    return ChangeMusicEvent(
+        state.tracks,
+        //if the length exceed start from last.
+        state.currentIndex > 0
+            ? state.currentIndex - 1
+            : state.tracks.length - 1,
+        width);
+  }
 }
 
 final class TotalDurationEvent extends AudioEvent {

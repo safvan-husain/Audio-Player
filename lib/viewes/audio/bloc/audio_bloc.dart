@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:math';
-import 'dart:developer' as dev;
 
 import 'package:audio_player/database/database_service.dart';
 import 'package:audio_player/services/track_model.dart';
@@ -8,7 +6,6 @@ import 'package:audio_player/utils/waveform_extension.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:bloc/bloc.dart';
-import 'package:flutter_media_metadata/flutter_media_metadata.dart';
 import 'package:just_waveform/just_waveform.dart';
 import 'package:meta/meta.dart';
 import 'package:path/path.dart';
@@ -19,36 +16,27 @@ part 'audio_state.dart';
 
 class AudioBloc extends Bloc<AudioEvent, AudioState> {
   final HomeBloc homeBloc;
+
   AudioBloc(this.homeBloc) : super(AudioState.initial()) {
     on<AudioInitEvent>((event, emit) async {
       if (state.controller == null) {
-        // event.onNavigate();
-        await _setnewTrackListAndPlayCurrent(emit, event);
+        emit(state.copyWith(
+          changeType: ChangeType.initial,
+          controller: AudioPlayer(),
+          currentIndex: event.currentIndex,
+          progressStream: BehaviorSubject<WaveformProgress>(),
+          tracks: event.tracks,
+          isPlaying: true,
+        ));
+        await state.controller!.play(DeviceFileSource(
+            state.tracks.elementAt(state.currentIndex).trackUrl));
       } else if (_isCurrentlyPlayingAndSelectedNotSame(event)) {
         //if the current audio is different from selected audio.
         add(ChangeMusicEvent(event.tracks, event.currentIndex, event.width));
       }
-      _listenToControllerAndEmitLoadedState(emit, event);
+      _listenToControllers(event);
 
-      if (_isWaveFormAlreadyGeneratedForThisAudio(event)) {
-        _updateTotalDuration(event.tracks
-            .elementAt(event.currentIndex)
-            .waveformWrapper!
-            .waveform
-            .duration);
-      } else {
-        Duration? dur = await extractTrackDuration(
-            event.tracks.elementAt(event.currentIndex).trackUrl);
-        if (dur != null) {
-          _updateTotalDuration(dur);
-        }
-
-        //will update total duration on progress stream completion.
-        _generateWaveForm(
-          event.tracks.elementAt(event.currentIndex),
-          state.progressStream,
-        );
-      }
+      _generateWaveFormIfNeeded(event);
     });
 
     on<AudioEndEvent>((event, emit) {
@@ -63,19 +51,7 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
           isPlaying: true,
         ));
       } else if (event.playerState == PlayerState.completed) {
-        add(
-          ChangeMusicEvent(
-            state.tracks,
-            state.isShuffling
-                //pick random if shuffle is true.
-                ? Random().nextInt(state.tracks.length)
-                //if the index exceed the length start from beggning.
-                : state.currentIndex > state.tracks.length - 2
-                    ? 0
-                    : state.currentIndex + 1,
-            event.width,
-          ),
-        );
+        add(ChangeMusicEvent.next(state, event.width));
       } else {
         emit(state.copyWith(
             changeType: ChangeType.playerState, isPlaying: false));
@@ -112,19 +88,24 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
         event.width,
       ));
     });
+
     on<AddTrackToFavorites>((event, emit) {
       DataBaseService().addTrackToFavorites(
           state.tracks.elementAt(state.currentIndex).trackName);
     });
+
     on<RemoveTrackFromFavorites>((event, emit) {});
+
     on<PlayListPlayerStateSwitch>((event, emit) {
-      dev.log('play list player state');
+      //when click on the playlist play/pause button.
       if (state.tracks == event.tracks) {
+        //if currently playing tracks are same, just toggle the player state.
         add(SwitchPlayerStateEvent());
       } else {
         add(AudioInitEvent(event.tracks, 0, event.width));
       }
     });
+
     on<SwitchShuffle>((event, emit) {
       emit(state.copyWith(
         changeType: ChangeType.shuffle,
@@ -154,8 +135,12 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
               trackDetail: track.trackDetail,
               trackUrl: track.trackUrl,
               waveformWrapper: WaveformWrapper(data.waveform!),
+              trackDuration: track.trackDuration,
+              coverImage: track.coverImage,
             ),
             () {
+              //updating the tracklist, if not waveform warapper
+              //will be still null for this track in home state.
               homeBloc.add(RenderTracksFromApp());
             },
           );
@@ -166,59 +151,28 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
     }
   }
 
-  Future<Duration?> extractTrackDuration(String trackUrl) async {
-    final metadata = await MetadataRetriever.fromFile(
-      File(trackUrl),
-    );
-    if (metadata.trackDuration != null) {
-      return Duration(milliseconds: metadata.trackDuration!);
+  ///generate waveform if not exist.
+  void _generateWaveFormIfNeeded(AudioInitEvent event) {
+    if (event.tracks.elementAt(event.currentIndex).waveformWrapper == null) {
+      _generateWaveForm(
+        event.tracks.elementAt(event.currentIndex),
+        state.progressStream,
+      );
     }
-    return null;
   }
 
-//refactor.
-  void _listenToControllerAndEmitLoadedState(
-      Emitter<AudioState> emit, AudioInitEvent event) {
+  void _listenToControllers(AudioInitEvent event) {
     state.controller!.onPositionChanged.listen((Duration p) {
       add(AudioPositionChangedEvent(p));
     });
-    state.controller!.onDurationChanged.listen((Duration d) {
-      if (state.totalDuration == Duration.zero) {
-        add(TotalDurationEvent(d));
-      }
-    });
+
     state.controller!.onPlayerStateChanged.listen((PlayerState s) {
       add(AudioPlayerStateChangedEvent(s, event.width));
     });
   }
 
-  void _updateTotalDuration(Duration duration) {
-    if (state.totalDuration == Duration.zero) {
-      add(TotalDurationEvent(duration));
-    }
-  }
-
-  bool _isWaveFormAlreadyGeneratedForThisAudio(AudioInitEvent event) =>
-      event.tracks.elementAt(event.currentIndex).waveformWrapper != null;
-
   bool _isCurrentlyPlayingAndSelectedNotSame(AudioInitEvent event) {
     return (state.tracks.elementAt(state.currentIndex).trackName) !=
         event.tracks.elementAt(event.currentIndex).trackName;
-  }
-
-  ///emit [AudioInitial] and set&play audio controller.
-  Future<void> _setnewTrackListAndPlayCurrent(
-      Emitter<AudioState> emit, AudioInitEvent event) async {
-    dev.log('_setnewTrackListAndPlayCurrent called');
-    emit(state.copyWith(
-      changeType: ChangeType.initial,
-      controller: AudioPlayer(),
-      currentIndex: event.currentIndex,
-      progressStream: BehaviorSubject<WaveformProgress>(),
-      tracks: event.tracks,
-      isPlaying: true,
-    ));
-    await state.controller!.play(
-        DeviceFileSource(state.tracks.elementAt(state.currentIndex).trackUrl));
   }
 }

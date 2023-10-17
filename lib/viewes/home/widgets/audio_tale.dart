@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 
@@ -21,12 +22,29 @@ class AudioTale extends StatefulWidget {
 
 class _AudioTaleState extends State<AudioTale> {
   bool isFavorite = false;
+  late Future<Metadata> metadata;
+  late String trackName;
 
   Future<Metadata> extractTrackDetails() async {
     final metadata = await MetadataRetriever.fromFile(
       File(widget.track.trackUrl),
     );
     return metadata;
+  }
+
+  @override
+  void initState() {
+    metadata = extractTrackDetails();
+    trackName = widget.track.trackName;
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (trackName != widget.track.trackName) {
+      metadata = extractTrackDetails();
+    }
+    super.didChangeDependencies();
   }
 
   @override
@@ -38,28 +56,10 @@ class _AudioTaleState extends State<AudioTale> {
         children: [
           SizedBox(
             height: 80.r,
-            child: FutureBuilder(
-              future: extractTrackDetails(),
-              builder: (context, snp) {
-                if (snp.hasData) {
-                  if (snp.data!.albumArt != null) {
-                    return Image.memory(
-                      snp.data!.albumArt!,
-                      fit: BoxFit.fitHeight,
-                      gaplessPlayback: true,
-                    );
-                  }
-
-                  return Image.asset(
-                    'assets/images/pop2.jpeg',
-                    fit: BoxFit.cover,
-                  );
-                }
-                return Image.asset(
-                  'assets/images/pop2.jpeg',
-                  fit: BoxFit.cover,
-                );
-              },
+            child: Image.memory(
+              widget.track.coverImage,
+              fit: BoxFit.fitHeight,
+              gaplessPlayback: true,
             ),
           ),
           const SizedBox(width: 20),
@@ -70,7 +70,8 @@ class _AudioTaleState extends State<AudioTale> {
               children: [
                 Text(
                   cutString(widget.track.trackName),
-                  maxLines: 2,
+                  maxLines: 1,
+                  overflow: TextOverflow.fade,
                   style: const TextStyle(
                     fontSize: 15,
                     color: Colors.white,
@@ -80,6 +81,8 @@ class _AudioTaleState extends State<AudioTale> {
                 const SizedBox(height: 5),
                 Text(
                   widget.track.trackDetail,
+                  maxLines: 1,
+                  overflow: TextOverflow.fade,
                   style: const TextStyle(
                     color: Colors.grey,
                   ),
@@ -96,9 +99,12 @@ class _AudioTaleState extends State<AudioTale> {
                   .read<HomeBloc>()
                   .add(Favorite(isFavorite, widget.track.trackName));
             },
-            child: Icon(
-              isFavorite ? Icons.favorite : Icons.favorite_outline,
-              color: Colors.redAccent,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(
+                isFavorite ? Icons.favorite : Icons.favorite_outline,
+                color: Theme.of(context).focusColor,
+              ),
             ),
           )
         ],
@@ -134,6 +140,20 @@ class _AudioTaleState extends State<AudioTale> {
       // ),
     );
   }
+}
+
+Future<Uint8List> _readFileByte(Uri myUri) async {
+  print('callled this method');
+  File audioFile = File.fromUri(myUri);
+  Uint8List bytes;
+  try {
+    bytes = await audioFile.readAsBytes();
+  } catch (e) {
+    throw e;
+  }
+
+  print(base64Encode(bytes));
+  return bytes;
 }
 
 String cutString(String input) {

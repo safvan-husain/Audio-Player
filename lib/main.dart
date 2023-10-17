@@ -1,4 +1,5 @@
 import 'package:audio_player/common/theme.dart';
+import 'package:audio_player/database/data_base.dart';
 import 'package:audio_player/database/database_service.dart';
 
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
@@ -12,7 +13,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  DataBaseService dataBaseService = DataBaseService();
+  MyDataBase dataBaseService = MyDataBase();
   await dataBaseService.init();
   HomeBloc homeBloc = HomeBloc();
   runApp(

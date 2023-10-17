@@ -35,70 +35,25 @@ class _IndicatorsState extends State<Indicators> {
           current.changeType == ChangeType.totalDuration ||
           current.changeType == ChangeType.currentDuration,
       builder: (context, state) {
-        return SizedBox(
-          height: 100.h,
-          width: MediaQuery.of(context).size.width,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Flexible(
-                child: Material(
-                  color: Colors.transparent,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Flexible(
-                        child: InkWell(
-                            onTap: () {
-                              String trackName = track.trackName;
-                              context
-                                  .read<s.PlayListWindowBloc>()
-                                  .add(s.LoadPlayLists(trackName, () {
-                                    Navigator.of(context).push(
-                                      PopUpRoute(PlayListDailogue(trackName)),
-                                    );
-                                  }));
-                            },
-                            child: const Icon(Icons.playlist_add)),
-                      ),
-                      const Flexible(child: Icon(Icons.shuffle)),
-                      const Flexible(child: Icon(Icons.repeat)),
-                      Flexible(
-                          child: InkWell(
-                        onTap: () {
-                          setState(() => isFavorite = !isFavorite);
-                          context
-                              .read<HomeBloc>()
-                              .add(Favorite(isFavorite, track.trackName));
-                        },
-                        child: Icon(
-                          isFavorite ? Icons.favorite : Icons.favorite_outline,
-                          color: Colors.redAccent,
-                        ),
-                      )),
-                    ],
-                  ),
-                ),
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              cutString(track.trackName),
+              maxLines: 1,
+              overflow: TextOverflow.fade,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 5),
+            Text(
+              track.trackDetail,
+              maxLines: 1,
+              overflow: TextOverflow.fade,
+              style: const TextStyle(
+                color: Colors.grey,
               ),
-              Flexible(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                        child: Text(
-                      formatDuration(state.currentDuration),
-                      style: Theme.of(context).textTheme.titleMedium,
-                    )),
-                    Flexible(
-                        child: Text(
-                      formatDuration(state.totalDuration),
-                      style: Theme.of(context).textTheme.titleMedium,
-                    )),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            )
+          ],
         );
       },
     );
@@ -118,4 +73,11 @@ String formatDuration(Duration d) {
   } else {
     return "${twoDigits(d.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
   }
+}
+
+String cutString(String input) {
+  RegExp regExp = RegExp(r'^[a-zA-Z0-9 ,]*');
+  Match? match = regExp.firstMatch(input);
+  String output = match?.group(0) ?? '';
+  return output.length < 10 ? input : output;
 }

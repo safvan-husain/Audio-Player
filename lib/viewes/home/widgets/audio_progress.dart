@@ -9,26 +9,23 @@ class AudioProgress extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AudioBloc, AudioState>(
       builder: (context, state) {
+        int duration = state.tracks
+            .elementAt(state.currentIndex)
+            .trackDuration
+            .inMilliseconds;
         return GestureDetector(
           onTapDown: (details) {
             RenderBox box = context.findRenderObject() as RenderBox;
             Offset position = box.globalToLocal(details.globalPosition);
-            // position.dx gives you the x-coordinate of the touch event
-            // You can then calculate the timestamp based on this x-coordinate
             double ratio = position.dx / box.size.width;
-            Duration timestamp = Duration(
-                milliseconds:
-                    (ratio * state.totalDuration.inMilliseconds).round());
-            print("Touched at ${timestamp.inSeconds} seconds");
+            Duration timestamp =
+                Duration(milliseconds: (ratio * duration).round());
             state.controller!.seek(timestamp);
           },
           child: LinearProgressIndicator(
             backgroundColor: Theme.of(context).splashColor,
             color: Theme.of(context).focusColor,
-            value: state.totalDuration == Duration.zero
-                ? null
-                : state.currentDuration.inMilliseconds /
-                    state.totalDuration.inMilliseconds,
+            value: state.currentDuration.inMilliseconds / duration,
           ),
         );
       },

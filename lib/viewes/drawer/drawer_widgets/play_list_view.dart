@@ -5,7 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PlayListView extends StatelessWidget {
-  const PlayListView({
+  final void Function() closeDrawer;
+  const PlayListView(
+    this.closeDrawer, {
     super.key,
   });
 
@@ -52,6 +54,7 @@ class PlayListView extends StatelessWidget {
                               context.read<HomeBloc>().add(
                                   RenderPlayList(playLists.elementAt(index)));
                             }
+                            closeDrawer();
                           },
                           child: Container(
                             decoration: const BoxDecoration(
