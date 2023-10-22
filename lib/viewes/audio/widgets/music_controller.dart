@@ -5,6 +5,7 @@ import 'package:audio_player/viewes/playlist_pop_up_window/dailogue.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:just_waveform/just_waveform.dart';
 
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
@@ -43,8 +44,6 @@ class MusicController extends StatelessWidget {
             player: state.controller!,
             isPlaying: state.isPlaying,
             currentDuration: state.currentDuration,
-            color: Theme.of(context).splashColor,
-            backgroundColor: Theme.of(context).focusColor,
           ),
         Flexible(
           child: Row(
@@ -53,13 +52,22 @@ class MusicController extends StatelessWidget {
               Flexible(
                   child: Text(
                 formatDuration(state.currentDuration),
-                style: Theme.of(context).textTheme.titleMedium,
+                style: GoogleFonts.poppins(
+                    color: Theme.of(context).cardColor,
+                    textStyle: TextStyle(
+                        overflow: TextOverflow.ellipsis, fontSize: 14.r),
+                    decoration: TextDecoration.none),
               )),
               Flexible(
                   child: Text(
                 formatDuration(
                     state.tracks.elementAt(state.currentIndex).trackDuration),
-                style: Theme.of(context).textTheme.titleMedium,
+                style: GoogleFonts.poppins(
+                  color: Theme.of(context).cardColor,
+                  textStyle: TextStyle(
+                      overflow: TextOverflow.ellipsis, fontSize: 14.r),
+                  decoration: TextDecoration.none,
+                ),
               )),
             ],
           ),
@@ -99,8 +107,6 @@ class MusicController extends StatelessWidget {
             player: state.controller!,
             isPlaying: state.isPlaying,
             currentDuration: state.currentDuration,
-            color: Theme.of(context).splashColor,
-            backgroundColor: Theme.of(context).focusColor,
           );
         }
       },
@@ -127,7 +133,10 @@ class MusicController extends StatelessWidget {
                         );
                       }));
                 },
-                child: const Icon(Icons.playlist_add)),
+                child: Icon(
+                  Icons.playlist_add,
+                  color: Theme.of(context).cardColor,
+                )),
           ),
           SizedBox(
             width: 150.w,
@@ -148,7 +157,7 @@ class MusicController extends StatelessWidget {
                     },
                     child: CircleAvatar(
                       radius: 25.r,
-                      backgroundColor: Theme.of(context).splashColor,
+                      backgroundColor: Theme.of(context).focusColor,
                       child: Icon(
                           state.isPlaying ? Icons.pause : Icons.play_arrow),
                     )),
@@ -169,7 +178,8 @@ class MusicController extends StatelessWidget {
               context.read<AudioBloc>().add(SwitchShuffle());
             },
             child: Icon(
-                state.isShuffling ? Icons.shuffle_on_outlined : Icons.shuffle),
+                state.isShuffling ? Icons.shuffle_on_outlined : Icons.shuffle,
+                color: Theme.of(context).cardColor),
           )),
         ],
       ),

@@ -4,6 +4,7 @@ import 'package:audio_player/viewes/home/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class PlayListHeader extends StatelessWidget {
   final String playListName;
@@ -52,7 +53,11 @@ class PlayListHeader extends StatelessWidget {
                           children: [
                             Text(
                               playListName,
-                              style: Theme.of(context).textTheme.titleLarge,
+                              style: GoogleFonts.russoOne(
+                                  color: Theme.of(context).focusColor,
+                                  textStyle: TextStyle(
+                                      overflow: TextOverflow.ellipsis,
+                                      fontSize: 20.r)),
                             ),
                             Text(
                               '$numberOfSongs ${numberOfSongs > 1 ? "audios" : "audio"} : ${formatDuration(totalDuration)}',

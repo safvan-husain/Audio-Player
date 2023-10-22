@@ -99,12 +99,14 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
 
     on<PlayListPlayerStateSwitch>((event, emit) {
       //when click on the playlist play/pause button.
-      if (state.tracks == event.tracks) {
-        //if currently playing tracks are same, just toggle the player state.
-        add(SwitchPlayerStateEvent());
-      } else {
-        log('audio init event from playlist player state switch');
-        add(AudioInitEvent(event.tracks, 0, event.width));
+      if (event.tracks.isNotEmpty) {
+        if (state.tracks == event.tracks) {
+          //if currently playing tracks are same, just toggle the player state.
+          add(SwitchPlayerStateEvent());
+        } else {
+          log('audio init event from playlist player state switch');
+          add(AudioInitEvent(event.tracks, 0, event.width));
+        }
       }
     });
 
@@ -129,6 +131,9 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
           .listen((data) {
         progressStream.add(data);
         if (data.waveform != null) {
+          //adding wave form for the track object.
+          state.tracks.elementAt(state.currentIndex).waveformWrapper =
+              WaveformWrapper(data.waveform!);
           DataBaseService().storeWaveForm(
             Track(
               trackName: track.trackName,
@@ -139,12 +144,12 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
               coverImage: track.coverImage,
             ),
             () {
-              //updating the tracklist, if not, waveform warapper
+              //updating the tracklist on Home, if not, waveform warapper
               //will be still null for this track in home state.
-              if (state is PlayListRendered) {
-                homeBloc.add(RenderPlayList(homeBloc.state.playLists[0]));
-              } else {
+              if (homeBloc.state.onHome) {
                 homeBloc.add(RenderTracksFromApp());
+              } else {
+                homeBloc.add(RenderPlayList(homeBloc.state.playLists[0]));
               }
             },
           );

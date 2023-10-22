@@ -23,8 +23,8 @@ class AudioProgress extends StatelessWidget {
             state.controller!.seek(timestamp);
           },
           child: LinearProgressIndicator(
-            backgroundColor: Theme.of(context).splashColor,
-            color: Theme.of(context).focusColor,
+            backgroundColor: Theme.of(context).canvasColor,
+            color: Theme.of(context).splashColor,
             value: state.currentDuration.inMilliseconds / duration,
           ),
         );

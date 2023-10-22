@@ -1,6 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Button extends StatelessWidget {
   final String label;
@@ -31,8 +32,8 @@ class Button extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: const BorderRadius.all(Radius.circular(10)),
               color: isOn
-                  ? Theme.of(context).cardColor
-                  : Theme.of(context).focusColor,
+                  ? Theme.of(context).highlightColor
+                  : Theme.of(context).cardColor,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -40,11 +41,14 @@ class Button extends StatelessWidget {
               children: [
                 Icon(
                   icon,
-                  color: isOn ? Theme.of(context).focusColor : Colors.black,
+                  color: Theme.of(context).focusColor,
                 ),
                 Text(
                   label,
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: GoogleFonts.russoOne(
+                      color: Theme.of(context).focusColor,
+                      textStyle: TextStyle(
+                          overflow: TextOverflow.ellipsis, fontSize: 16.r)),
                 ),
               ],
             ),

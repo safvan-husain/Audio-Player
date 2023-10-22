@@ -24,6 +24,21 @@ mixin TrackDataBase {
     }
   }
 
+  Future<void> deleteNonExistentTracks(List<Track> tracks) async {
+    List<Track> allTracks = await getAllTracks();
+
+    List<String> trackNames = tracks.map((track) => track.trackName).toList();
+
+    // Filter out the tracks that are not in the given list
+    List<Track> tracksToDelete = allTracks
+        .where((track) => !trackNames.contains(track.trackName))
+        .toList();
+
+    for (var track in tracksToDelete) {
+      await deleteTrack(track.trackName);
+    }
+  }
+
   Future<void> storeWaveForm(Track track, void Function() onSaved) async {
     await _db.update(
       'Tracks',
@@ -43,6 +58,13 @@ mixin TrackDataBase {
       );
     } else {
       throw ('track not found');
+    }
+  }
+
+  Future<void> deleteAllTracks() async {
+    List<Map<String, Object?>> res = await _db.rawQuery("SELECT * FROM Tracks");
+    for (var r in res) {
+      deleteTrack(r['trackName'] as String);
     }
   }
 

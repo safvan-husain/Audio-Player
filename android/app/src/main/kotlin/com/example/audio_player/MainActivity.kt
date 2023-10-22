@@ -10,18 +10,35 @@ import android.provider.MediaStore
 import android.database.Cursor
 import android.net.Uri
 import android.util.Log
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
+import org.json.JSONObject
+import org.json.JSONArray
 
 
 
-@Serializable
+
+
 data class AudioModel(
     var trackName: String? = null,
     var trackDetail: String? = null,
     var trackUrl: String? = null,
     var trackDuration: Long? = null,
 )
+
+fun AudioModel.toJSON(): JSONObject {
+    val jsonObject = JSONObject()
+    jsonObject.put("trackName", this.trackName)
+    jsonObject.put("trackDetail", this.trackDetail)
+    jsonObject.put("trackUrl", this.trackUrl)
+    jsonObject.put("trackDuration", this.trackDuration)
+    return jsonObject
+}
+fun List<AudioModel>.toJSONArray(): JSONArray {
+    val jsonArray = JSONArray()
+    this.forEach { audioModel ->
+        jsonArray.put(audioModel.toJSON())
+    }
+    return jsonArray
+}
 
 private const val mTAG = "MainActivity"
 
@@ -89,17 +106,9 @@ class MainActivity: FlutterActivity() {
             val rand = getAllAudioFromDevice(this);
             Log.v(mTAG, "tempAudioList length: ${rand?.size}")
             if (rand != null && rand.isNotEmpty()) {
-                val jsonString = Json.encodeToString(rand)
-                result.success(jsonString)
+                val jsonString = rand.toJSONArray()
+                result.success(jsonString.toString())
             } else {
-                if(rand == null) {
-                Log.v(mTAG, "rand is null")
-
-                }else {
-                     Log.v(mTAG, "rand is not null")
-                     Log.v(mTAG, Json.encodeToString(rand))
-
-                }
                 result.success("[]")
             }
         }

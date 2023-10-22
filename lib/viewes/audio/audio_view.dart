@@ -66,7 +66,8 @@ class AudioView extends StatelessWidget {
                                   Flexible(
                                     child: InkWell(
                                       onTap: () {},
-                                      child: const Icon(Icons.horizontal_split),
+                                      child: Icon(Icons.horizontal_split,
+                                          color: Theme.of(context).cardColor),
                                     ),
                                   ),
                                   Flexible(
@@ -97,9 +98,12 @@ class AudioView extends StatelessWidget {
                           ),
                           Expanded(
                             flex: 4,
-                            child: Image.memory(state.tracks
-                                .elementAt(state.currentIndex)
-                                .coverImage),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 40.w),
+                              child: Image.memory(state.tracks
+                                  .elementAt(state.currentIndex)
+                                  .coverImage),
+                            ),
                           ),
                           const Spacer(),
                           const TrackTitle(),

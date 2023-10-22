@@ -13,16 +13,12 @@ class WaveFormControl extends StatelessWidget {
     required this.player,
     required this.isPlaying,
     required this.currentDuration,
-    required this.color,
-    required this.backgroundColor,
   });
 
   final Waveform waveform;
   final AudioPlayer player;
   final bool isPlaying;
   final Duration currentDuration;
-  final Color color;
-  final Color backgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -61,8 +57,8 @@ class WaveFormControl extends StatelessWidget {
               currentDuration: state.currentDuration,
               strokeWidth: 2.0,
               pixelsPerStep: 3.0,
-              color: color,
-              backgroundColor: backgroundColor,
+              color: Theme.of(context).focusColor,
+              backgroundColor: Theme.of(context).cardColor,
             ),
           ),
         );

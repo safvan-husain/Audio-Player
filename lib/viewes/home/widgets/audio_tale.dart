@@ -3,6 +3,7 @@ import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AudioTale extends StatefulWidget {
   final Track track;
@@ -41,14 +42,21 @@ class _AudioTaleState extends State<AudioTale> {
                   cutString(widget.track.trackName),
                   maxLines: 1,
                   overflow: TextOverflow.fade,
-                  style: Theme.of(context).textTheme.labelLarge,
+                  style: GoogleFonts.poppins(
+                    color: Theme.of(context).focusColor,
+                    textStyle: TextStyle(
+                        overflow: TextOverflow.ellipsis, fontSize: 16.r),
+                  ),
                 ),
                 const SizedBox(height: 5),
                 Text(
                   widget.track.trackDetail,
                   maxLines: 1,
                   overflow: TextOverflow.fade,
-                  style: Theme.of(context).textTheme.bodySmall,
+                  style: GoogleFonts.poppins(
+                      color: Theme.of(context).cardColor,
+                      textStyle: TextStyle(
+                          overflow: TextOverflow.ellipsis, fontSize: 12.r)),
                 )
               ],
             ),

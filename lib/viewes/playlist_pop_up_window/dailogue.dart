@@ -2,6 +2,7 @@ import 'package:audio_player/viewes/playlist_pop_up_window/bloc/play_list_window
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class PlayListDailogue extends StatelessWidget {
   final String trackName;
@@ -80,7 +81,11 @@ class PlayListDailogue extends StatelessWidget {
             },
             autofocus: true,
             decoration: const InputDecoration.collapsed(hintText: 'type here'),
-            style: Theme.of(context).textTheme.titleSmall,
+            style: GoogleFonts.poppins(
+              color: Theme.of(context).splashColor,
+              textStyle:
+                  TextStyle(overflow: TextOverflow.ellipsis, fontSize: 16.r),
+            ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -96,7 +101,11 @@ class PlayListDailogue extends StatelessWidget {
                 },
                 child: Text(
                   'submit',
-                  style: Theme.of(context).textTheme.titleSmall,
+                  style: GoogleFonts.poppins(
+                    color: Theme.of(context).splashColor,
+                    textStyle: TextStyle(
+                        overflow: TextOverflow.ellipsis, fontSize: 16.r),
+                  ),
                 ),
               )
             ],
@@ -127,12 +136,18 @@ class PlayListDailogue extends StatelessWidget {
                     }
                   }
                 },
-                checkColor: Theme.of(context).splashColor,
-                activeColor: Theme.of(context).scaffoldBackgroundColor,
+                checkColor: Theme.of(context).cardColor,
+                activeColor: Theme.of(context).splashColor,
+                focusColor: Theme.of(context).splashColor,
+                hoverColor: Theme.of(context).splashColor,
               ),
               Text(
                 e,
-                style: Theme.of(context).textTheme.titleSmall,
+                style: GoogleFonts.poppins(
+                  color: Theme.of(context).splashColor,
+                  textStyle: TextStyle(
+                      overflow: TextOverflow.ellipsis, fontSize: 16.r),
+                ),
               ),
             ],
           ),
@@ -150,12 +165,16 @@ class PlayListDailogue extends StatelessWidget {
         children: [
           const Icon(
             Icons.add,
-            color: Colors.black,
+            color: Color.fromARGB(224, 39, 48, 67),
           ),
           Flexible(
             child: Text(
               'create new playlist',
-              style: Theme.of(context).textTheme.titleSmall,
+              style: GoogleFonts.poppins(
+                color: Theme.of(context).splashColor,
+                textStyle:
+                    TextStyle(overflow: TextOverflow.ellipsis, fontSize: 16.r),
+              ),
             ),
           ),
         ],
@@ -167,13 +186,14 @@ class PlayListDailogue extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Flexible(
+        Flexible(
           child: Text(
             'Save Track to...',
             maxLines: 1,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 17,
+            style: GoogleFonts.poppins(
+              color: Theme.of(context).splashColor,
+              textStyle:
+                  TextStyle(overflow: TextOverflow.ellipsis, fontSize: 16.r),
             ),
           ),
         ),
@@ -182,9 +202,9 @@ class PlayListDailogue extends StatelessWidget {
             onTap: () {
               Navigator.of(context).pop();
             },
-            child: const Icon(
+            child: Icon(
               Icons.cancel,
-              color: Colors.black,
+              color: Theme.of(context).splashColor,
             ),
           ),
         ),

@@ -2,22 +2,20 @@
 
 import 'dart:async';
 import 'dart:developer';
-import 'package:audio_player/common/icon_box.dart';
+import 'package:audio_player/common/theme_services.dart';
 import 'package:audio_player/services/audio_download_service.dart';
 import 'package:audio_player/services/track_model.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
-import 'package:audio_player/viewes/drawer/bloc/drawer_bloc.dart';
-import 'package:audio_player/viewes/drawer/drawer.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:audio_player/viewes/home/widgets/audio_controll.dart';
 import 'package:audio_player/viewes/home/widgets/audio_list.dart';
 import 'package:audio_player/viewes/home/widgets/audio_search_tile.dart';
-import 'package:audio_player/viewes/home/widgets/audio_tale.dart';
 import 'package:audio_player/viewes/home/widgets/play_list_header.dart';
 import 'package:audio_player/viewes/home/widgets/play_list_view.dart';
 import 'package:audio_player/viewes/home/widgets/processing_download/pop_up_view.dart';
 import 'package:audio_player/viewes/playlist_pop_up_window/pop_up_route.dart';
 import 'package:custom_search_bar/custom_search_bar.dart';
+import 'package:get/get.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -113,18 +111,19 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       key: _scaffoldKey,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: GestureDetector(
-          onHorizontalDragEnd: (DragEndDetails details) {
-            // if (details.velocity.pixelsPerSecond.dx > 0) {
-            //   context.read<DrawerBloc>().add(ListPlayLists());
-            //   _scaffoldKey.currentState?.openDrawer();
-            // }
-          },
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height,
-            child: Stack(
-              children: [
-                SingleChildScrollView(
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height,
+          child: Stack(
+            children: [
+              RefreshIndicator(
+                onRefresh: () async {
+                  if (context.read<HomeBloc>().state.onHome) {
+                    context.read<HomeBloc>().add(RenderTracksFromDevice());
+                  }
+                },
+                backgroundColor: Theme.of(context).cardColor,
+                color: Theme.of(context).splashColor,
+                child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   child: BlocBuilder<HomeBloc, HomeState>(
                     builder: (context, state) {
@@ -139,10 +138,10 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                     },
                   ),
                 ),
-                if (context.watch<AudioBloc>().state.controller != null)
-                  const AudioControl()
-              ],
-            ),
+              ),
+              if (context.watch<AudioBloc>().state.controller != null)
+                const AudioControl()
+            ],
           ),
         ),
       ),
@@ -199,8 +198,10 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           InkWell(
-            onTap: () {},
-            child: const Icon(Icons.horizontal_split),
+            borderRadius: BorderRadius.circular(30),
+            onTap: () => ThemeService().switchTheme(),
+            child:
+                Icon(context.isDarkMode ? Icons.light_mode : Icons.dark_mode),
           ),
           BlocBuilder<HomeBloc, HomeState>(
             builder: (context, state) {
@@ -211,7 +212,8 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                     items: state.trackList,
                     filter: (track) => [track.trackName, track.trackDetail],
                     itemBuilder: (t) => Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
                       child: AudioSearchTale(track: t),
                     ),
                   ),

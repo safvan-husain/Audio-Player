@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:audio_player/services/track_model.dart';
 import 'package:audio_player/viewes/audio/audio_view.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
@@ -8,6 +6,7 @@ import 'package:audio_player/viewes/home/widgets/audio_progress.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AudioControl extends StatefulWidget {
   const AudioControl({
@@ -55,6 +54,11 @@ class _AudioControlState extends State<AudioControl> {
                 Navigator.of(context)
                     .push(MaterialPageRoute(builder: (c) => const AudioView()));
               },
+              onHorizontalDragEnd: (DragEndDetails details) {
+                if (details.velocity.pixelsPerSecond.dx > 0) {
+                  context.read<AudioBloc>().add(AudioEndEvent());
+                }
+              },
               child: Card(
                 color: Theme.of(context).cardColor,
                 child: Container(
@@ -83,6 +87,14 @@ class _AudioControlState extends State<AudioControl> {
 
   Widget _buildNameAndButtons(BuildContext context, AudioState state) {
     Track track = state.tracks.elementAt(state.currentIndex);
+    List<Track> tracksHome = context
+        .watch<HomeBloc>()
+        .state
+        .trackList
+        .where((element) =>
+            element.trackName ==
+            state.tracks.elementAt(state.currentIndex).trackName)
+        .toList();
 
     return Flexible(
       child: Row(
@@ -91,7 +103,10 @@ class _AudioControlState extends State<AudioControl> {
           Flexible(
             child: Text(
               state.tracks.elementAt(state.currentIndex).trackName,
-              style: Theme.of(context).textTheme.titleSmall,
+              style: GoogleFonts.poppins(
+                  color: Theme.of(context).splashColor,
+                  textStyle: TextStyle(
+                      overflow: TextOverflow.ellipsis, fontSize: 14.r)),
             ),
           ),
           Flexible(
@@ -109,7 +124,7 @@ class _AudioControlState extends State<AudioControl> {
                         state.isPlaying
                             ? Icons.pause_circle_filled_outlined
                             : Icons.play_arrow_outlined,
-                        color: Theme.of(context).scaffoldBackgroundColor,
+                        color: Theme.of(context).splashColor,
                       ),
                     ),
                   ),
@@ -123,10 +138,14 @@ class _AudioControlState extends State<AudioControl> {
                             track.trackName));
                       },
                       child: Icon(
-                        state.tracks.elementAt(state.currentIndex).isFavorite
+                        (tracksHome.isNotEmpty
+                                ? tracksHome[0].isFavorite
+                                : state.tracks
+                                    .elementAt(state.currentIndex)
+                                    .isFavorite)
                             ? Icons.favorite
                             : Icons.favorite_border,
-                        color: Theme.of(context).focusColor,
+                        color: Theme.of(context).splashColor,
                       ),
                     ),
                   ),

@@ -27,7 +27,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           //using android mediastore.
           jsonListTracks = await platform.invokeMethod("getRandomNumber");
         } on PlatformException catch (e) {
-          print(e);
+          print('Error code: ${e.code}');
+          print('Error message: ${e.message}');
+          print('Error details: ${e.details}');
           jsonListTracks = '';
         }
         List trackList = jsonDecode(jsonListTracks);
@@ -45,10 +47,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       for (var track in tracks) {
         await databaseServices.insertTrack(track);
       }
+      await databaseServices.deleteNonExistentTracks(tracks);
       add(RenderTracksFromApp());
     });
 
     on<RenderTracksFromApp>((event, emit) async {
+      log('track from app event caleed');
       //used to render tracks from app storage.
       List<Track> tracks = await databaseServices.getAllTracks();
       add(ListPlayLists());
@@ -69,6 +73,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     // });
 
     on<Favorite>((event, emit) async {
+      log('fav event caleed');
       List<String> favTrackNames = await databaseServices.getAllFavorites();
       if (event.isFavorite) {
         databaseServices.addTrackToFavorites(event.trackName);
@@ -77,7 +82,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         databaseServices.removeFromFavorite(event.trackName);
         favTrackNames.remove(event.trackName);
       }
-      if (state.playLists.length==1 && state.playLists[0] == "favorites") {
+      if (state.playLists.length == 1 &&
+          state.playLists[0] == "favorites" &&
+          !state.onHome) {
         emit(state.copyWith(
           tracks: favoriteTracksOnly(state.trackList, favTrackNames),
           playLists: state.playLists,
@@ -91,6 +98,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     });
     on<ListPlayLists>(
       (event, emit) async {
+        log('list-play-lists event caleed');
         List<String> playLists = await databaseServices.getAllPlayListName();
         log('playLists event called ${playLists.toString()}');
         emit(PlayListLoaded(trackList: state.trackList, playLists: playLists));
@@ -98,6 +106,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     );
     on<RenderPlayList>(
       (event, emit) async {
+        log('render-play-lists event caleed');
         List<String> favTrackNames = await databaseServices.getAllFavorites();
         List<Track> tracks =
             await databaseServices.getTracksFromPlayList(event.playListName);
