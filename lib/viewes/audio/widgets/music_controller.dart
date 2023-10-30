@@ -2,6 +2,7 @@ import 'package:audio_player/services/track_model.dart';
 import 'package:audio_player/viewes/home/widgets/processing_download/pop_up_route.dart';
 import 'package:audio_player/viewes/playlist_pop_up_window/bloc/play_list_window_bloc.dart';
 import 'package:audio_player/viewes/playlist_pop_up_window/dailogue.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -18,9 +19,6 @@ class MusicController extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<AudioBloc, AudioState>(
       builder: (context, state) {
-        if (state.controller == null) {
-          return const Center(child: CircularProgressIndicator());
-        }
         return buildController(context, state);
       },
     );
@@ -41,8 +39,8 @@ class MusicController extends StatelessWidget {
                 .elementAt(state.currentIndex)
                 .waveformWrapper!
                 .waveform,
-            player: state.controller!,
-            isPlaying: state.isPlaying,
+            player: state.audioHandler.player,
+            isPlaying: state.isPlaying == PlayerState.playing,
             currentDuration: state.currentDuration,
           ),
         Flexible(
@@ -104,8 +102,8 @@ class MusicController extends StatelessWidget {
         } else {
           return WaveFormControl(
             waveform: waveform,
-            player: state.controller!,
-            isPlaying: state.isPlaying,
+            player: state.audioHandler.player,
+            isPlaying: state.isPlaying == PlayerState.playing,
             currentDuration: state.currentDuration,
           );
         }
@@ -153,13 +151,16 @@ class MusicController extends StatelessWidget {
                 ),
                 GestureDetector(
                     onTap: () {
-                      context.read<AudioBloc>().add(SwitchPlayerStateEvent());
+                      context
+                          .read<AudioBloc>()
+                          .add(SwitchPlayerStateEvent(width));
                     },
                     child: CircleAvatar(
                       radius: 25.r,
                       backgroundColor: Theme.of(context).focusColor,
-                      child: Icon(
-                          state.isPlaying ? Icons.pause : Icons.play_arrow),
+                      child: Icon(state.isPlaying == PlayerState.playing
+                          ? Icons.pause
+                          : Icons.play_arrow),
                     )),
                 InkWell(
                   onTap: () {

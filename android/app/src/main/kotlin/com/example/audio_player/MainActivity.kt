@@ -12,6 +12,7 @@ import android.net.Uri
 import android.util.Log
 import org.json.JSONObject
 import org.json.JSONArray
+import com.ryanheise.audioservice.AudioServiceActivity;
 
 
 
@@ -96,7 +97,7 @@ fun getAllAudioFromDevice(context: Context): List<AudioModel>? {
     return tempAudioList
 }
 
-class MainActivity: FlutterActivity() {
+class MainActivity : AudioServiceActivity() {
   override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
     super.configureFlutterEngine(flutterEngine)
     MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "example.com/channel").setMethodCallHandler {

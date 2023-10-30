@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:audio_player/services/track_model.dart';
 import 'package:audio_player/viewes/audio/audio_view.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:audio_player/viewes/home/widgets/audio_progress.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,15 +24,19 @@ class _AudioControlState extends State<AudioControl> {
   bool isVisible = false;
   bool isFavorite = false;
   late Track track;
+  late Timer _timer;
   @override
   void initState() {
-    Future.delayed(
-      const Duration(seconds: 1),
-      () {
-        setState(() => isVisible = true);
-      },
-    );
+    _timer = Timer(const Duration(seconds: 1), () {
+      setState(() => isVisible = true);
+    });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 
   @override
@@ -118,10 +125,11 @@ class _AudioControlState extends State<AudioControl> {
                   Flexible(
                     child: InkWell(
                       onTap: () {
-                        context.read<AudioBloc>().add(SwitchPlayerStateEvent());
+                        context.read<AudioBloc>().add(SwitchPlayerStateEvent(
+                            MediaQuery.of(context).size.width));
                       },
                       child: Icon(
-                        state.isPlaying
+                        state.isPlaying == PlayerState.playing
                             ? Icons.pause_circle_filled_outlined
                             : Icons.play_arrow_outlined,
                         color: Theme.of(context).splashColor,

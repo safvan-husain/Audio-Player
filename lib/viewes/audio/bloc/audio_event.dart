@@ -27,7 +27,8 @@ final class AudioPlayerStateChangedEvent extends AudioEvent {
 }
 
 final class SwitchPlayerStateEvent extends AudioEvent {
-  SwitchPlayerStateEvent();
+  final double width;
+  SwitchPlayerStateEvent(this.width);
 }
 
 final class ChangeMusicEvent extends AudioEvent {
@@ -41,7 +42,7 @@ final class ChangeMusicEvent extends AudioEvent {
     return ChangeMusicEvent(
         state.tracks,
         //if the length exceed start from 0.
-        state.tracks.length - 1 > state.currentIndex
+        state.currentIndex < state.tracks.length - 1
             ? state.currentIndex + 1
             : 0,
         width);

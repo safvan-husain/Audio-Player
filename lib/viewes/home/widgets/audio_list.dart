@@ -33,7 +33,7 @@ class AudioList extends StatelessWidget {
               context.read<HomeBloc>().add(RenderTracksFromApp());
             },
             onTap: () {
-              if (context.read<AudioBloc>().state.controller == null) {
+              if (context.read<AudioBloc>().state.tracks.isEmpty) {
                 Navigator.of(context).push(
                   MaterialPageRoute(builder: (ctx) => const AudioView()),
                 );

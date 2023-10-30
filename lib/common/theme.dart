@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 class MyTheme {
   static ThemeData light = ThemeData(
+    applyElevationOverlayColor: true,
     brightness: Brightness.light,
     visualDensity: const VisualDensity(vertical: 0.5, horizontal: 0.5),
     primarySwatch: const MaterialColor(
@@ -84,6 +85,7 @@ class MyTheme {
   );
 
   static ThemeData dark = ThemeData(
+    applyElevationOverlayColor: false,
     brightness: Brightness.dark,
     visualDensity: const VisualDensity(vertical: 0.5, horizontal: 0.5),
     primarySwatch: const MaterialColor(

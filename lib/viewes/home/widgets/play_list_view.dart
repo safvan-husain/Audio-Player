@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:audio_player/common/outline_text.dart/text_custom_paint.dart';
+import 'package:audio_player/common/theme_services.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,40 +37,28 @@ class PlayListView extends StatelessWidget {
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(4)),
-                      image: DecorationImage(
-                        image: AssetImage('assets/images/playlist.jpg'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    child: Stack(children: [
-                      Positioned(
-                        bottom: 10,
-                        left: 10,
-                        right: 10,
-                        child: Container(
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(4.r)),
-                            color: const Color.fromARGB(200, 145, 151, 174),
-                          ),
-                          padding: const EdgeInsets.all(10),
-                          child: Text(
-                            playLists.elementAt(index),
-                            style: GoogleFonts.russoOne(
-                              color: Theme.of(context).splashColor,
-                              textStyle: TextStyle(
-                                overflow: TextOverflow.ellipsis,
-                                fontSize: 25.r,
-                              ),
-                            ),
+                  child: BlocBuilder<ThemeService, bool>(
+                    builder: (context, state) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(4)),
+                          image: DecorationImage(
+                            image: AssetImage(
+                                'assets/images/${!context.isDarkMode ? "lover.jpeg" : "fav-d.jpeg"}'),
+                            fit: BoxFit.cover,
                           ),
                         ),
-                      )
-                    ]),
+                        child: Stack(children: [
+                          Positioned(
+                            top: 75,
+                            left: 10,
+                            child: OutlinedText(
+                                playLists.elementAt(index), context.isDarkMode),
+                          )
+                        ]),
+                      );
+                    },
                   ),
                 ),
               );

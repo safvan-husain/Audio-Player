@@ -1,6 +1,7 @@
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:audio_player/viewes/home/widgets/button.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -85,14 +86,14 @@ class PlayListHeader extends StatelessWidget {
                     return Row(
                       children: [
                         Button(
-                          isOn: audioState.isPlaying &&
+                          isOn: audioState.isPlaying == PlayerState.playing &&
                               audioState.tracks == state.trackList,
                           //show playing if the tracklist on both same.
-                          label: audioState.isPlaying &&
+                          label: audioState.isPlaying == PlayerState.playing &&
                                   audioState.tracks == state.trackList
                               ? "pause"
                               : 'play',
-                          icon: audioState.isPlaying &&
+                          icon: audioState.isPlaying == PlayerState.playing &&
                                   audioState.tracks == state.trackList
                               ? Icons.pause
                               : Icons.play_arrow,

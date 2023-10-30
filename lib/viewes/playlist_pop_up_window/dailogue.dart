@@ -34,7 +34,7 @@ class PlayListDailogue extends StatelessWidget {
                   padding: EdgeInsets.all(15.r),
                   width: 200.w,
                   height: 110.h +
-                      state.possiblePlaylists.length * 45.h +
+                      state.possiblePlaylists.length * 55.h +
                       ((state is InputTextState) ? 50.h : 0),
                   decoration: BoxDecoration(
                     color: Theme.of(context).cardColor,
@@ -66,7 +66,7 @@ class PlayListDailogue extends StatelessWidget {
     TextEditingController controller = TextEditingController();
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10.w),
-      height: 50.h,
+      // height: 50.h,
       child: Column(
         children: [
           TextField(

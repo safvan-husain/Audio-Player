@@ -40,13 +40,6 @@ class WaveFormControl extends StatelessWidget {
             print("Touched at ${timestamp.inSeconds} seconds");
             await player.seek(timestamp);
           },
-          onDoubleTap: () {
-            if (state.isPlaying) {
-              state.controller!.pause();
-            } else {
-              state.controller!.resume();
-            }
-          },
           child: SizedBox(
             height: 100.h,
             width: double.infinity,

@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:audio_player/database/database_service.dart';
+import 'package:audio_player/services/audio_player_services.dart';
 import 'package:audio_player/services/track_model.dart';
 import 'package:audio_player/utils/waveform_extension.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
@@ -12,50 +13,68 @@ import 'package:meta/meta.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:logger/logger.dart';
 part 'audio_event.dart';
 part 'audio_state.dart';
 
 class AudioBloc extends Bloc<AudioEvent, AudioState> {
   final HomeBloc homeBloc;
+  final AudioPlayerHandler audioHanfler;
 
-  AudioBloc(this.homeBloc) : super(AudioState.initial()) {
+  AudioBloc(this.homeBloc, this.audioHanfler)
+      : super(AudioState.initial(audioHanfler)) {
     on<AudioInitEvent>((event, emit) async {
-      if (state.controller == null) {
+      if (_isCurrentlyPlayingAndSelectedNotSame(event) ||
+          state.isPlaying == PlayerState.stopped) {
+        log('before event: ${event.tracks.length}');
         emit(state.copyWith(
           changeType: ChangeType.initial,
-          controller: AudioPlayer(),
           currentIndex: event.currentIndex,
           progressStream: BehaviorSubject<WaveformProgress>(),
           tracks: event.tracks,
-          isPlaying: true,
+          isPlaying: PlayerState.playing,
         ));
-        await state.controller!.play(DeviceFileSource(
-            state.tracks.elementAt(state.currentIndex).trackUrl));
-      } else if (_isCurrentlyPlayingAndSelectedNotSame(event)) {
-        //if the current audio is different from selected audio.
-        add(ChangeMusicEvent(event.tracks, event.currentIndex, event.width));
+        log('state : ${state.tracks.length} : ${state.currentIndex} : event : ${event.tracks.length} :${event.currentIndex} ');
+        await state.audioHandler.setNewFile(
+          state.tracks.elementAt(state.currentIndex),
+          onNext: () async {
+            log('on next: ${state.tracks.length}');
+            add(ChangeMusicEvent.next(state, event.width));
+          },
+          onPrevious: () {
+            add(ChangeMusicEvent.previous(state, event.width));
+          },
+          onStop: () async {
+            emit(state.end());
+          },
+        );
       }
       _listenToControllers(event);
-
       _generateWaveFormIfNeeded(event);
     });
 
     on<AudioEndEvent>((event, emit) {
-      if (state.controller != null) state.controller!.dispose();
-      emit(state.end());
+      state.audioHandler.stop();
+      emit(AudioState.initial(audioHanfler));
+    });
+
+    on<ChangeMusicEvent>((event, emit) async {
+      log('change music event');
+      // add(AudioEndEvent());
+      add(AudioInitEvent(
+        event.tracks,
+        event.currentIndex,
+        event.width,
+      ));
     });
 
     on<AudioPlayerStateChangedEvent>((event, emit) {
-      if (event.playerState == PlayerState.playing) {
-        emit(state.copyWith(
-          changeType: ChangeType.playerState,
-          isPlaying: true,
-        ));
-      } else if (event.playerState == PlayerState.completed) {
+      emit(state.copyWith(
+        changeType: ChangeType.playerState,
+        isPlaying: event.playerState,
+      ));
+      if (event.playerState == PlayerState.completed) {
         add(ChangeMusicEvent.next(state, event.width));
-      } else {
-        emit(state.copyWith(
-            changeType: ChangeType.playerState, isPlaying: false));
       }
     });
 
@@ -63,15 +82,18 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
       emit(state.copyWith(
         changeType: ChangeType.currentDuration,
         currentDuration: event.currentDuration,
-        isPlaying: true,
       ));
     });
 
     on<SwitchPlayerStateEvent>((event, emit) {
-      if (state.controller != null) {
-        state.isPlaying
-            ? state.controller!.pause()
-            : state.controller!.resume();
+      if (state.isPlaying == PlayerState.playing) {
+        state.audioHandler.pause();
+      } else if (state.isPlaying == PlayerState.stopped) {
+        log('stopped in switch');
+        add(AudioInitEvent(state.tracks, state.currentIndex, event.width));
+      } else {
+        log(state.tracks.length.toString());
+        state.audioHandler.play();
       }
     });
 
@@ -79,15 +101,6 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
       emit(state.copyWith(
           changeType: ChangeType.totalDuration,
           totalDuration: event.totalDuration));
-    });
-
-    on<ChangeMusicEvent>((event, emit) {
-      add(AudioEndEvent());
-      add(AudioInitEvent(
-        event.tracks,
-        event.currentIndex,
-        event.width,
-      ));
     });
 
     on<AddTrackToFavorites>((event, emit) {
@@ -102,7 +115,7 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
       if (event.tracks.isNotEmpty) {
         if (state.tracks == event.tracks) {
           //if currently playing tracks are same, just toggle the player state.
-          add(SwitchPlayerStateEvent());
+          add(SwitchPlayerStateEvent(event.width));
         } else {
           log('audio init event from playlist player state switch');
           add(AudioInitEvent(event.tracks, 0, event.width));
@@ -171,16 +184,19 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
   }
 
   void _listenToControllers(AudioInitEvent event) {
-    state.controller!.onPositionChanged.listen((Duration p) {
+    state.audioHandler.player.onPositionChanged.listen((Duration p) {
+      // print(p);
       add(AudioPositionChangedEvent(p));
     });
 
-    state.controller!.onPlayerStateChanged.listen((PlayerState s) {
+    state.audioHandler.player.onPlayerStateChanged.listen((PlayerState s) {
+      print(s);
       add(AudioPlayerStateChangedEvent(s, event.width));
     });
   }
 
   bool _isCurrentlyPlayingAndSelectedNotSame(AudioInitEvent event) {
+    if (state.tracks.isEmpty) return true;
     //return true if currently playing and selected is not same
     //or selected playlist and current playlist is not same.
     return (state.tracks.elementAt(state.currentIndex).trackName) !=

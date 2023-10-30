@@ -16,15 +16,15 @@ class AudioState {
   final int currentIndex;
   final List<Track> tracks;
 
-  final AudioPlayer? controller;
+  final AudioPlayerHandler audioHandler;
   final Duration currentDuration;
   BehaviorSubject<WaveformProgress> progressStream;
-  bool isPlaying;
+  PlayerState isPlaying;
   bool isShuffling;
 
   AudioState({
     required this.changeType,
-    required this.controller,
+    required this.audioHandler,
     required this.currentDuration,
     required this.isPlaying,
     required this.currentIndex,
@@ -34,9 +34,9 @@ class AudioState {
   });
   AudioState copyWith({
     required ChangeType changeType,
-    AudioPlayer? controller,
+    AudioPlayerHandler? audioHandler,
     Duration? currentDuration,
-    bool? isPlaying,
+    PlayerState? isPlaying,
     Duration? totalDuration,
     int? currentIndex,
     BehaviorSubject<WaveformProgress>? progressStream,
@@ -45,7 +45,7 @@ class AudioState {
   }) {
     return AudioState(
       changeType: changeType,
-      controller: controller ?? this.controller,
+      audioHandler: audioHandler ?? this.audioHandler,
       currentDuration: currentDuration ?? this.currentDuration,
       currentIndex: currentIndex ?? this.currentIndex,
       progressStream: progressStream ?? this.progressStream,
@@ -58,9 +58,9 @@ class AudioState {
   AudioState end() {
     return AudioState(
       changeType: ChangeType.end,
-      controller: null,
+      audioHandler: audioHandler,
       currentDuration: Duration.zero,
-      isPlaying: false,
+      isPlaying: PlayerState.disposed,
       currentIndex: currentIndex,
       progressStream: progressStream,
       tracks: tracks,
@@ -68,15 +68,15 @@ class AudioState {
     );
   }
 
-  factory AudioState.initial() {
+  factory AudioState.initial(AudioPlayerHandler audioHandler) {
     return AudioState(
       changeType: ChangeType.initial,
       currentDuration: Duration.zero,
-      controller: null,
+      audioHandler: audioHandler,
       currentIndex: 0,
       progressStream: BehaviorSubject<WaveformProgress>(),
       tracks: [],
-      isPlaying: false,
+      isPlaying: PlayerState.paused,
       isShuffling: true,
     );
   }

@@ -113,34 +113,43 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       body: SafeArea(
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
-          child: Stack(
+          child: Column(
             children: [
-              RefreshIndicator(
-                onRefresh: () async {
-                  if (context.read<HomeBloc>().state.onHome) {
-                    context.read<HomeBloc>().add(RenderTracksFromDevice());
-                  }
-                },
-                backgroundColor: Theme.of(context).cardColor,
-                color: Theme.of(context).splashColor,
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: BlocBuilder<HomeBloc, HomeState>(
-                    builder: (context, state) {
-                      return switch (state) {
-                        PlayListRendered(
-                          trackList: var trackList,
-                          playLists: var playLists,
-                        ) =>
-                          _buildPlayListPage(playLists, trackList),
-                        _ => _buildDefaultpage(context, state)
-                      };
-                    },
-                  ),
+              _buildAppBar(context),
+              Expanded(
+                child: Stack(
+                  children: [
+                    RefreshIndicator(
+                      onRefresh: () async {
+                        if (context.read<HomeBloc>().state.onHome) {
+                          context
+                              .read<HomeBloc>()
+                              .add(RenderTracksFromDevice());
+                        }
+                      },
+                      backgroundColor: Theme.of(context).cardColor,
+                      color: Theme.of(context).splashColor,
+                      child: SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        child: BlocBuilder<HomeBloc, HomeState>(
+                          builder: (context, state) {
+                            return switch (state) {
+                              PlayListRendered(
+                                trackList: var trackList,
+                                playLists: var playLists,
+                              ) =>
+                                _buildPlayListPage(playLists, trackList),
+                              _ => _buildDefaultpage(context, state)
+                            };
+                          },
+                        ),
+                      ),
+                    ),
+                    if (context.watch<AudioBloc>().state.tracks.isNotEmpty)
+                      const AudioControl(),
+                  ],
                 ),
               ),
-              if (context.watch<AudioBloc>().state.controller != null)
-                const AudioControl()
             ],
           ),
         ),
@@ -158,7 +167,6 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildAppBar(context),
           PlayListHeader(playListName: playLists[0]),
           AudioList(tracks: trackList)
         ],
@@ -170,7 +178,6 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _buildAppBar(context),
         switch (state) {
           HomeInitial() => SizedBox(
               height: MediaQuery.of(context).size.height - 50.h,
