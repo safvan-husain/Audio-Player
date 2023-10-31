@@ -1,7 +1,7 @@
 import 'dart:developer';
 
-import 'package:audio_player/common/outline_text.dart/text_custom_paint.dart';
-import 'package:audio_player/common/theme_services.dart';
+import 'package:audio_player/common/text_custom_paint.dart';
+import 'package:audio_player/common/theme/theme_services.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

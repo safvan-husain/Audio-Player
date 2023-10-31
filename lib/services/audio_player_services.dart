@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:audio_player/services/track_model.dart';
+import 'package:audio_player/common/track_model.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';
@@ -16,28 +16,21 @@ class AudioPlayerHandler extends BaseAudioHandler
   );
   final player = AudioPlayer();
 
-  //for UI and state changes corresponding to the actions.
+  //for UI and state changes corresponding to the actions from notification.
   void Function()? onNext;
   void Function()? onPrevious;
-  late Future<void> Function() onStop;
 
   AudioPlayerHandler() {
     player.onPlayerStateChanged.map(_transformEvent).pipe(playbackState);
-    player.onDurationChanged.listen((d) {
-      print(d);
-    });
   }
 
   Future<void> setNewFile(
     Track track, {
     required void Function() onNext,
     required void Function() onPrevious,
-    required Future<void> Function() onStop,
   }) async {
-    log('setNewFile');
     this.onNext = onNext;
     this.onPrevious = onPrevious;
-    this.onStop = onStop;
 
     _item = MediaItem(
       id: track.trackUrl,
@@ -56,7 +49,6 @@ class AudioPlayerHandler extends BaseAudioHandler
 
   @override
   Future<void> skipToNext() async {
-    log('skip to nect');
     if (onNext != null) onNext!();
   }
 
@@ -114,15 +106,11 @@ Future<Uri> _assetToFileUri() async {
   ByteData byteData = await rootBundle.load('assets/images/track.webp');
   Uint8List bytes = byteData.buffer.asUint8List();
 
-  // Get temporary directory
   Directory tempDir = await getTemporaryDirectory();
 
-  // Create new file in temporary directory
   File file = File('${tempDir.path}/tempFile');
 
-  // Write bytes to the file
   await file.writeAsBytes(bytes);
 
-  // Return the file's URI
   return file.uri;
 }

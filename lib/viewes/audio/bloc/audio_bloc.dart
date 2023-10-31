@@ -1,10 +1,9 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:audio_player/database/database_service.dart';
 import 'package:audio_player/services/audio_player_services.dart';
-import 'package:audio_player/services/track_model.dart';
-import 'package:audio_player/utils/waveform_extension.dart';
+import 'package:audio_player/common/track_model.dart';
+import 'package:audio_player/common/waveform_extension.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:bloc/bloc.dart';
@@ -13,7 +12,6 @@ import 'package:meta/meta.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:logger/logger.dart';
 part 'audio_event.dart';
 part 'audio_state.dart';
 
@@ -25,8 +23,8 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
       : super(AudioState.initial(audioHanfler)) {
     on<AudioInitEvent>((event, emit) async {
       if (_isCurrentlyPlayingAndSelectedNotSame(event) ||
-          state.isPlaying == PlayerState.stopped) {
-        log('before event: ${event.tracks.length}');
+          state.playerState == PlayerState.stopped) {
+        //preventing playing from the start if it is the same audio file.
         emit(state.copyWith(
           changeType: ChangeType.initial,
           currentIndex: event.currentIndex,
@@ -34,22 +32,20 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
           tracks: event.tracks,
           isPlaying: PlayerState.playing,
         ));
-        log('state : ${state.tracks.length} : ${state.currentIndex} : event : ${event.tracks.length} :${event.currentIndex} ');
+        //audio handler handle both in app controll and from notification panel.
         await state.audioHandler.setNewFile(
           state.tracks.elementAt(state.currentIndex),
-          onNext: () async {
-            log('on next: ${state.tracks.length}');
-            add(ChangeMusicEvent.next(state, event.width));
-          },
-          onPrevious: () {
-            add(ChangeMusicEvent.previous(state, event.width));
-          },
-          onStop: () async {
-            emit(state.end());
-          },
+          onNext: () => add(ChangeMusicEvent.next(state, event.width)),
+          onPrevious: () => add(ChangeMusicEvent.previous(state, event.width)),
         );
       }
-      _listenToControllers(event);
+      state.audioHandler.player.onPositionChanged.listen((Duration p) {
+        add(AudioPositionChangedEvent(p));
+      });
+
+      state.audioHandler.player.onPlayerStateChanged.listen((PlayerState s) {
+        add(AudioPlayerStateChangedEvent(s, event.width));
+      });
       _generateWaveFormIfNeeded(event);
     });
 
@@ -59,8 +55,6 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
     });
 
     on<ChangeMusicEvent>((event, emit) async {
-      log('change music event');
-      // add(AudioEndEvent());
       add(AudioInitEvent(
         event.tracks,
         event.currentIndex,
@@ -86,29 +80,26 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
     });
 
     on<SwitchPlayerStateEvent>((event, emit) {
-      if (state.isPlaying == PlayerState.playing) {
+      if (state.playerState == PlayerState.playing) {
         state.audioHandler.pause();
-      } else if (state.isPlaying == PlayerState.stopped) {
-        log('stopped in switch');
+      } else if (state.playerState == PlayerState.stopped) {
         add(AudioInitEvent(state.tracks, state.currentIndex, event.width));
       } else {
-        log(state.tracks.length.toString());
         state.audioHandler.play();
       }
     });
 
     on<TotalDurationEvent>((event, emit) {
       emit(state.copyWith(
-          changeType: ChangeType.totalDuration,
-          totalDuration: event.totalDuration));
+        changeType: ChangeType.totalDuration,
+        totalDuration: event.totalDuration,
+      ));
     });
 
     on<AddTrackToFavorites>((event, emit) {
       DataBaseService().addTrackToFavorites(
           state.tracks.elementAt(state.currentIndex).trackName);
     });
-
-    on<RemoveTrackFromFavorites>((event, emit) {});
 
     on<PlayListPlayerStateSwitch>((event, emit) {
       //when click on the playlist play/pause button.
@@ -117,7 +108,6 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
           //if currently playing tracks are same, just toggle the player state.
           add(SwitchPlayerStateEvent(event.width));
         } else {
-          log('audio init event from playlist player state switch');
           add(AudioInitEvent(event.tracks, 0, event.width));
         }
       }
@@ -181,18 +171,6 @@ class AudioBloc extends Bloc<AudioEvent, AudioState> {
         state.progressStream,
       );
     }
-  }
-
-  void _listenToControllers(AudioInitEvent event) {
-    state.audioHandler.player.onPositionChanged.listen((Duration p) {
-      // print(p);
-      add(AudioPositionChangedEvent(p));
-    });
-
-    state.audioHandler.player.onPlayerStateChanged.listen((PlayerState s) {
-      print(s);
-      add(AudioPlayerStateChangedEvent(s, event.width));
-    });
   }
 
   bool _isCurrentlyPlayingAndSelectedNotSame(AudioInitEvent event) {

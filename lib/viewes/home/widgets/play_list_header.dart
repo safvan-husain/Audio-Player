@@ -86,14 +86,15 @@ class PlayListHeader extends StatelessWidget {
                     return Row(
                       children: [
                         Button(
-                          isOn: audioState.isPlaying == PlayerState.playing &&
+                          isOn: audioState.playerState == PlayerState.playing &&
                               audioState.tracks == state.trackList,
                           //show playing if the tracklist on both same.
-                          label: audioState.isPlaying == PlayerState.playing &&
-                                  audioState.tracks == state.trackList
-                              ? "pause"
-                              : 'play',
-                          icon: audioState.isPlaying == PlayerState.playing &&
+                          label:
+                              audioState.playerState == PlayerState.playing &&
+                                      audioState.tracks == state.trackList
+                                  ? "pause"
+                                  : 'play',
+                          icon: audioState.playerState == PlayerState.playing &&
                                   audioState.tracks == state.trackList
                               ? Icons.pause
                               : Icons.play_arrow,

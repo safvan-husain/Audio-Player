@@ -19,14 +19,14 @@ class AudioState {
   final AudioPlayerHandler audioHandler;
   final Duration currentDuration;
   BehaviorSubject<WaveformProgress> progressStream;
-  PlayerState isPlaying;
+  PlayerState playerState;
   bool isShuffling;
 
   AudioState({
     required this.changeType,
     required this.audioHandler,
     required this.currentDuration,
-    required this.isPlaying,
+    required this.playerState,
     required this.currentIndex,
     required this.progressStream,
     required this.tracks,
@@ -50,7 +50,7 @@ class AudioState {
       currentIndex: currentIndex ?? this.currentIndex,
       progressStream: progressStream ?? this.progressStream,
       tracks: tracks ?? this.tracks,
-      isPlaying: isPlaying ?? this.isPlaying,
+      playerState: isPlaying ?? playerState,
       isShuffling: isShuffling ?? this.isShuffling,
     );
   }
@@ -60,7 +60,7 @@ class AudioState {
       changeType: ChangeType.end,
       audioHandler: audioHandler,
       currentDuration: Duration.zero,
-      isPlaying: PlayerState.disposed,
+      playerState: PlayerState.disposed,
       currentIndex: currentIndex,
       progressStream: progressStream,
       tracks: tracks,
@@ -76,7 +76,7 @@ class AudioState {
       currentIndex: 0,
       progressStream: BehaviorSubject<WaveformProgress>(),
       tracks: [],
-      isPlaying: PlayerState.paused,
+      playerState: PlayerState.paused,
       isShuffling: true,
     );
   }

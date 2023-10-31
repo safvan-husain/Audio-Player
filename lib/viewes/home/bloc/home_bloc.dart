@@ -1,9 +1,8 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:audio_player/database/database_service.dart';
-import 'package:audio_player/services/track_model.dart';
+import 'package:audio_player/common/track_model.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_media_metadata/flutter_media_metadata.dart';
@@ -26,11 +25,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           //extracting all the tracks from internal and external storage
           //using android mediastore.
           jsonListTracks = await platform.invokeMethod("getRandomNumber");
-        } on PlatformException catch (e) {
-          print('Error code: ${e.code}');
-          print('Error message: ${e.message}');
-          print('Error details: ${e.details}');
-          jsonListTracks = '';
+        } on PlatformException {
+          jsonListTracks = '[]';
         }
         List trackList = jsonDecode(jsonListTracks);
 
@@ -52,7 +48,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     });
 
     on<RenderTracksFromApp>((event, emit) async {
-      log('track from app event caleed');
       //used to render tracks from app storage.
       List<Track> tracks = await databaseServices.getAllTracks();
       add(ListPlayLists());
@@ -63,17 +58,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       ));
     });
 
-    // on<RenderPlayList>((event, emit) async {
-    //   List<String> favTrackNames = await databaseServices.getAllFavorites();
-
-    //   emit(HomeLoaded(
-    //     trackList: setFavoriteForTracks(state.trackList, favTrackNames),
-    //     playLists: state.playLists,
-    //   ));
-    // });
-
     on<Favorite>((event, emit) async {
-      log('fav event caleed');
       List<String> favTrackNames = await databaseServices.getAllFavorites();
       if (event.isFavorite) {
         databaseServices.addTrackToFavorites(event.trackName);
@@ -98,15 +83,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     });
     on<ListPlayLists>(
       (event, emit) async {
-        log('list-play-lists event caleed');
         List<String> playLists = await databaseServices.getAllPlayListName();
-        log('playLists event called ${playLists.toString()}');
+
         emit(PlayListLoaded(trackList: state.trackList, playLists: playLists));
       },
     );
     on<RenderPlayList>(
       (event, emit) async {
-        log('render-play-lists event caleed');
         List<String> favTrackNames = await databaseServices.getAllFavorites();
         List<Track> tracks =
             await databaseServices.getTracksFromPlayList(event.playListName);

@@ -2,7 +2,7 @@
 import 'dart:developer';
 
 import 'package:audio_player/database/database_service.dart';
-import 'package:audio_player/services/track_model.dart';
+import 'package:audio_player/common/track_model.dart';
 import 'package:audio_player/viewes/audio/audio_view.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';

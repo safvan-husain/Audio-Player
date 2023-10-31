@@ -2,9 +2,9 @@
 
 import 'dart:async';
 import 'dart:developer';
-import 'package:audio_player/common/theme_services.dart';
+import 'package:audio_player/common/theme/theme_services.dart';
 import 'package:audio_player/services/audio_download_service.dart';
-import 'package:audio_player/services/track_model.dart';
+import 'package:audio_player/common/track_model.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:audio_player/viewes/home/widgets/audio_controll.dart';
@@ -45,13 +45,14 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     ReceiveSharingIntent.getTextStream().listen((String value) async {
       Navigator.of(context).push(PopUpRoute(const DownloadDailogue()));
       AudioDownloadService().fetchData(
-        value,
-        (url) async {
+        ytId: value,
+        onMp3Generated: (url) async {
           _isLauched = true;
           _launchInBrowser(Uri.parse(url));
         },
-        () {
+        onFailure: (message) {
           Navigator.of(context).pop();
+          throw ('failure to convert');
         },
       );
     }, onError: (err) {
@@ -61,13 +62,14 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     // For sharing or opening urls/text coming from outside the app while the app is closed
     ReceiveSharingIntent.getInitialText().then((String? value) {
       if (value != null) {
+        Navigator.of(context).push(PopUpRoute(const DownloadDailogue()));
         AudioDownloadService().fetchData(
-          value,
-          (url) async {
+          ytId: value,
+          onMp3Generated: (url) async {
             _isLauched = true;
             _launchInBrowser(Uri.parse(url));
           },
-          () {
+          onFailure: (message) {
             Navigator.of(context).pop();
           },
         );
@@ -130,6 +132,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                       backgroundColor: Theme.of(context).cardColor,
                       color: Theme.of(context).splashColor,
                       child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(2),
                         physics: const AlwaysScrollableScrollPhysics(),
                         child: BlocBuilder<HomeBloc, HomeState>(
                           builder: (context, state) {
@@ -188,7 +191,6 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
           _ => Column(
               children: [
                 const PlayListView(),
-                // const PlayListHeader(),
                 AudioList(tracks: state.trackList)
               ],
             ),

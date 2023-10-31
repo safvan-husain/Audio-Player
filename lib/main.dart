@@ -1,5 +1,5 @@
-import 'package:audio_player/common/theme.dart';
-import 'package:audio_player/common/theme_services.dart';
+import 'package:audio_player/common/theme/theme.dart';
+import 'package:audio_player/common/theme/theme_services.dart';
 import 'package:audio_player/database/data_base.dart';
 import 'package:audio_player/services/audio_player_services.dart';
 
@@ -56,7 +56,6 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'Flutter Demo',
           theme: MyTheme.light,
           darkTheme: MyTheme.dark,
           home: const HomeView(),

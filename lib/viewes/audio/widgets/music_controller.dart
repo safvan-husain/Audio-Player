@@ -1,4 +1,4 @@
-import 'package:audio_player/services/track_model.dart';
+import 'package:audio_player/common/track_model.dart';
 import 'package:audio_player/viewes/home/widgets/processing_download/pop_up_route.dart';
 import 'package:audio_player/viewes/playlist_pop_up_window/bloc/play_list_window_bloc.dart';
 import 'package:audio_player/viewes/playlist_pop_up_window/dailogue.dart';
@@ -40,7 +40,7 @@ class MusicController extends StatelessWidget {
                 .waveformWrapper!
                 .waveform,
             player: state.audioHandler.player,
-            isPlaying: state.isPlaying == PlayerState.playing,
+            isPlaying: state.playerState == PlayerState.playing,
             currentDuration: state.currentDuration,
           ),
         Flexible(
@@ -103,7 +103,7 @@ class MusicController extends StatelessWidget {
           return WaveFormControl(
             waveform: waveform,
             player: state.audioHandler.player,
-            isPlaying: state.isPlaying == PlayerState.playing,
+            isPlaying: state.playerState == PlayerState.playing,
             currentDuration: state.currentDuration,
           );
         }
@@ -158,7 +158,7 @@ class MusicController extends StatelessWidget {
                     child: CircleAvatar(
                       radius: 25.r,
                       backgroundColor: Theme.of(context).focusColor,
-                      child: Icon(state.isPlaying == PlayerState.playing
+                      child: Icon(state.playerState == PlayerState.playing
                           ? Icons.pause
                           : Icons.play_arrow),
                     )),
