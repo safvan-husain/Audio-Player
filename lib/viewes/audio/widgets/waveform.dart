@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
+import 'package:audio_player/bloc/audio bloc/audio_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

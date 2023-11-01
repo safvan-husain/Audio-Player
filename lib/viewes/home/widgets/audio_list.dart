@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
-import 'package:audio_player/common/track_model.dart';
-import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
+import 'package:audio_player/model/track_model.dart';
+import 'package:audio_player/bloc/audio bloc/audio_bloc.dart';
 import 'package:flutter/material.dart';
 
 import 'package:audio_player/viewes/home/widgets/audio_tale.dart';

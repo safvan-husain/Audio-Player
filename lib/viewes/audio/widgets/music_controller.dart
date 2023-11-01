@@ -1,15 +1,15 @@
-import 'package:audio_player/common/track_model.dart';
+import 'package:audio_player/model/track_model.dart';
 import 'package:audio_player/viewes/audio/widgets/seek_controller.dart';
 import 'package:audio_player/viewes/home/widgets/processing_download/pop_up_route.dart';
-import 'package:audio_player/viewes/playlist_pop_up_window/bloc/play_list_window_bloc.dart';
-import 'package:audio_player/viewes/playlist_pop_up_window/dailogue.dart';
+import 'package:audio_player/bloc/playlist%20bloc/play_list_window_bloc.dart';
+import 'package:audio_player/viewes/audio/widgets/playlist_pop_up_window/dailogue.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
+import 'package:audio_player/bloc/audio bloc/audio_bloc.dart';
 
 class MusicController extends StatelessWidget {
   const MusicController({Key? key}) : super(key: key);

@@ -1,7 +1,6 @@
-
-import 'package:audio_player/common/text_custom_paint.dart';
-import 'package:audio_player/common/theme/theme_services.dart';
-import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
+import 'package:audio_player/utils/text_custom_paint.dart';
+import 'package:audio_player/theme/get_storage.dart';
+import 'package:audio_player/bloc/home bloc/home_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

@@ -1,6 +1,6 @@
 import 'package:audio_player/database/play_list_data_base.dart';
 import 'package:audio_player/database/track_data_base.dart';
-import 'package:audio_player/common/track_model.dart';
+import 'package:audio_player/model/track_model.dart';
 
 class DataBaseService with TrackDataBase, PlayListDataBase {
   // Private constructor to prevent external instantiation

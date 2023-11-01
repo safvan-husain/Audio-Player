@@ -1,5 +1,5 @@
 import 'package:audio_player/database/database_service.dart';
-import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
+import 'package:audio_player/bloc/home bloc/home_bloc.dart';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 

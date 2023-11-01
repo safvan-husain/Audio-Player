@@ -15,7 +15,7 @@ The Audio Player app is a versatile audio tool designed to allow users to downlo
 
 ## Installation
 
-1. Download the Audio Player app from [Google Drive](https://flutter.dev/docs/get-started/install).
+1. Download the Audio Player app from [Google Drive](https://drive.google.com/drive/folders/12eCZN5g8HDahnbhAMPUzezFydkoy48JD?usp=share_link).
 
 ## Usage
 
@@ -27,48 +27,29 @@ The Audio Player app is a versatile audio tool designed to allow users to downlo
 6. If the download is not an MP3, cancel it.
 7. Open the app and refresh by swiping down if the downloaded MP3 is not visible.
 
-The Audio Player app provides a simple and efficient way to enjoy your favorite YouTube audio content in MP3 format on your Android device.
-
 ## App Architecture
 
-Explain the architecture of your app. Discuss how it's divided into different modules and how these modules interact with each other.
+- **/lib**
 
-## Codebase Overview
-
-Provide a walkthrough of the codebase. Explain the purpose of key files and directories.
+  - **/bloc**: This section contains the majority of the application's business logic.
+  - **/database**:
+    - `class MyDataBase`: This class contain the SQLite `db` object, handles its initialization, and manages table creation.
+    - `class DataBaseService`: A singleton class that provides methods for data manipulation throughout the application.
+    - Mixins `PlayListDataBase` and `TrackDataBase`: These mixins offer specific methods related to playlists and tracks, which is utilized through `DataBaseService`.
+  - **/services**:
+    1. [Audio Download Service](#audio-download-service)
+    2. [Audio Player Service](#audio-player-service)
 
 ## Key Features Implementation
 
-For each major feature of your app, explain how it is implemented. Discuss the classes, methods, and algorithms that are essential for the feature.
+### Audio Download Service
 
-## Running the tests
+This service employs the following API: `'https://youtube-mp3-download1.p.rapidapi.com/'`. It is used to convert YouTube videos to MP3 format and, upon success, provides a URL to a web page containing the MP3 file. Efforts were made to automate this process via web scraping, but the download link remains unexposed in the HTML.
 
-Explain how to run the automated tests for this system.
+### Audio Player Service
 
-## Deployment
+The audio player service utilizes the Dart packages `audioplayers` and `audio services`. A critical component is the `class AudioHandler`, an extension of `BaseHandler` from the `audio service` package, designed for controlling audio playback from the notification panel. Within its constructor, `player.onPlayerStateChanged.map(_transformEvent).pipe(playbackState)` is employed to ensure that changes in the audio player state are reflected in the control panel.
 
-Add additional notes about how to deploy this on a live system.
+### WaveForm Visualization
 
-## Troubleshooting
-
-Include a section for common errors and their solutions.
-
-## Contributing
-
-Please read [CONTRIBUTING.md](link_to_your_contributing.md) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Authors
-
-- **Your Name** - _Initial work_ - [YourName](link_to_your_profile)
-
-See also the list of [contributors](link_to_contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-- Hat tip to anyone whose code was used
-- Inspiration
-- etc
+To generate waveform data from audio file project utlize Dart packages `just waveform`.and `CustomPaint` used to visualize the data.

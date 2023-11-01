@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-import 'package:audio_player/common/waveform_extension.dart';
+import 'package:audio_player/model/waveform_extension.dart';
 import 'package:flutter/services.dart';
 
 class Track {

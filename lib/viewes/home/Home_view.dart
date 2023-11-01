@@ -1,16 +1,16 @@
 // ignore_for_file: avoid_print
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
-import 'package:audio_player/common/theme/theme_services.dart';
-import 'package:audio_player/common/track_model.dart';
-import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
-import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
+import 'package:audio_player/theme/get_storage.dart';
+import 'package:audio_player/model/track_model.dart';
+import 'package:audio_player/bloc/audio bloc/audio_bloc.dart';
+import 'package:audio_player/bloc/home bloc/home_bloc.dart';
 import 'package:audio_player/viewes/home/widgets/audio_controll.dart';
 import 'package:audio_player/viewes/home/widgets/audio_list.dart';
 import 'package:audio_player/viewes/home/widgets/audio_search_tile.dart';
 import 'package:audio_player/viewes/home/widgets/play_list_header.dart';
 import 'package:audio_player/viewes/home/widgets/play_list_view.dart';
 import 'package:audio_player/viewes/home/widgets/processing_download/pop_up_view.dart';
-import 'package:audio_player/viewes/playlist_pop_up_window/pop_up_route.dart';
+import 'package:audio_player/viewes/audio/widgets/playlist_pop_up_window/pop_up_route.dart';
 import 'package:custom_search_bar/custom_search_bar.dart';
 import 'package:get/get.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';

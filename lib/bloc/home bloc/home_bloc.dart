@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:audio_player/database/database_service.dart';
-import 'package:audio_player/common/track_model.dart';
+import 'package:audio_player/model/track_model.dart';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_media_metadata/flutter_media_metadata.dart';

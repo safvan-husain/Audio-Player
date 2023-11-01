@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:audio_player/common/track_model.dart';
+import 'package:audio_player/model/track_model.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/services.dart';

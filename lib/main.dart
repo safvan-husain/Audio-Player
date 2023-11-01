@@ -1,12 +1,12 @@
-import 'package:audio_player/common/theme/theme.dart';
-import 'package:audio_player/common/theme/theme_services.dart';
+import 'package:audio_player/theme/theme.dart';
+import 'package:audio_player/theme/get_storage.dart';
 import 'package:audio_player/database/data_base.dart';
 import 'package:audio_player/services/audio_player_services.dart';
 
-import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
-import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
+import 'package:audio_player/bloc/audio bloc/audio_bloc.dart';
+import 'package:audio_player/bloc/home bloc/home_bloc.dart';
 import 'package:audio_player/viewes/home/home_view.dart';
-import 'package:audio_player/viewes/playlist_pop_up_window/bloc/play_list_window_bloc.dart';
+import 'package:audio_player/bloc/playlist%20bloc/play_list_window_bloc.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

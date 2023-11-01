@@ -1,9 +1,9 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:audio_player/common/waveform_extension.dart';
+import 'package:audio_player/model/waveform_extension.dart';
 import 'package:audio_player/database/data_base.dart';
-import 'package:audio_player/common/track_model.dart';
+import 'package:audio_player/model/track_model.dart';
 import 'package:just_waveform/just_waveform.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
