@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:audio_player/common/text_custom_paint.dart';
 import 'package:audio_player/common/theme/theme_services.dart';
@@ -7,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class PlayListView extends StatelessWidget {
   const PlayListView({
@@ -37,7 +35,7 @@ class PlayListView extends StatelessWidget {
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: BlocBuilder<ThemeService, bool>(
+                  child: BlocBuilder<FastStorage, bool>(
                     builder: (context, state) {
                       return Container(
                         decoration: BoxDecoration(

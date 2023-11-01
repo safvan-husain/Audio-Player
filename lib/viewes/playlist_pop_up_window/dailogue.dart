@@ -77,10 +77,13 @@ class PlayListDailogue extends StatelessWidget {
                     .read<PlayListWindowBloc>()
                     .add(CreateNewPlayList(controller.text));
               }
-              // Navigator.of(context).pop();
             },
             autofocus: true,
-            decoration: const InputDecoration.collapsed(hintText: 'type here'),
+            decoration: const InputDecoration.collapsed(
+              hintText: 'type here',
+              hintStyle:
+                  TextStyle(overflow: TextOverflow.ellipsis, fontSize: 14),
+            ),
             style: GoogleFonts.poppins(
               color: Theme.of(context).splashColor,
               textStyle:

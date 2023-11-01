@@ -20,7 +20,7 @@ class AudioProgress extends StatelessWidget {
             double ratio = position.dx / box.size.width;
             Duration timestamp =
                 Duration(milliseconds: (ratio * duration).round());
-            state.audioHandler!.seek(timestamp);
+            state.audioHandler.seek(timestamp);
           },
           child: LinearProgressIndicator(
             backgroundColor: Theme.of(context).canvasColor,

@@ -43,7 +43,7 @@ class AudioPlayerHandler extends BaseAudioHandler
     try {
       await player.play(DeviceFileSource(track.trackUrl));
     } catch (e) {
-      print(e);
+      print('trhorow$e');
     }
   }
 

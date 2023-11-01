@@ -8,7 +8,6 @@ import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'dart:developer';
 
 class AudioView extends StatelessWidget {
   const AudioView({Key? key}) : super(key: key);

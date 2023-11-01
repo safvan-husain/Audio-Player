@@ -1,23 +1,19 @@
 import 'dart:math';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:just_waveform/just_waveform.dart';
 
-class WaveFormControl extends StatelessWidget {
-  const WaveFormControl({
+class WaveFormVisulizer extends StatelessWidget {
+  const WaveFormVisulizer({
     super.key,
     required this.waveform,
-    required this.player,
-    required this.isPlaying,
     required this.currentDuration,
   });
 
   final Waveform waveform;
-  final AudioPlayer player;
-  final bool isPlaying;
+
   final Duration currentDuration;
 
   @override
@@ -27,32 +23,16 @@ class WaveFormControl extends StatelessWidget {
           current.changeType == ChangeType.currentDuration ||
           current.changeType == ChangeType.playerState,
       builder: (context, state) {
-        return GestureDetector(
-          onTapDown: (details) async {
-            RenderBox box = context.findRenderObject() as RenderBox;
-            Offset position = box.globalToLocal(details.globalPosition);
-            // position.dx gives you the x-coordinate of the touch event
-            // You can then calculate the timestamp based on this x-coordinate
-            double ratio = position.dx / box.size.width;
-            Duration timestamp = Duration(
-                milliseconds:
-                    (ratio * waveform.duration.inMilliseconds).round());
-            print("Touched at ${timestamp.inSeconds} seconds");
-            await player.seek(timestamp);
-          },
-          child: SizedBox(
-            height: 100.h,
-            width: double.infinity,
-            child: AudioWaveformWidget(
-              waveform: waveform,
-              start: Duration.zero,
-              duration: waveform.duration,
-              currentDuration: state.currentDuration,
-              strokeWidth: 2.0,
-              pixelsPerStep: 3.0,
-              color: Theme.of(context).focusColor,
-              backgroundColor: Theme.of(context).cardColor,
-            ),
+        return SizedBox(
+          height: 100.h,
+          width: double.infinity,
+          child: AudioWaveformWidget(
+            waveform: waveform,
+            start: Duration.zero,
+            duration: waveform.duration,
+            currentDuration: state.currentDuration,
+            strokeWidth: 2.0,
+            pixelsPerStep: 3.0,
           ),
         );
       },
@@ -68,8 +48,6 @@ class AudioWaveformWidget extends StatefulWidget {
   final Duration start;
   final Duration duration;
   final Duration currentDuration;
-  final Color color;
-  final Color backgroundColor;
 
   const AudioWaveformWidget({
     Key? key,
@@ -77,21 +55,18 @@ class AudioWaveformWidget extends StatefulWidget {
     required this.start,
     required this.duration,
     required this.currentDuration,
-    required this.color,
-    required this.backgroundColor,
     this.scale = 1.0,
     this.strokeWidth = 5.0,
     this.pixelsPerStep = 8.0,
   }) : super(key: key);
 
   @override
-  _AudioWaveformState createState() => _AudioWaveformState();
+  AudioWaveformState createState() => AudioWaveformState();
 }
 
-class _AudioWaveformState extends State<AudioWaveformWidget> {
+class AudioWaveformState extends State<AudioWaveformWidget> {
   @override
   Widget build(BuildContext context) {
-    // d.log('current : ' + widget.currentDuration.toString());
     return ClipRect(
       child: CustomPaint(
         painter: AudioWaveformPainter(
@@ -102,8 +77,8 @@ class _AudioWaveformState extends State<AudioWaveformWidget> {
           strokeWidth: widget.strokeWidth,
           pixelsPerStep: widget.pixelsPerStep,
           currentDuration: widget.currentDuration,
-          color: widget.color,
-          backgroundColor: widget.backgroundColor,
+          color: Theme.of(context).focusColor,
+          backgroundColor: Theme.of(context).cardColor,
         ),
       ),
     );
@@ -153,7 +128,6 @@ class AudioWaveformPainter extends CustomPainter {
         i <= waveformPixelsPerWindow + 1.0;
         i += waveformPixelsPerStep) {
       final sampleIdx = (sampleOffset + i).toInt();
-      // d.log("currentDuration new painet : " + currentDuration.toString());
       final playedPart = waveform.positionToPixel(currentDuration).toInt();
       if (sampleIdx <= playedPart) {
         wavePaint.color = color; // Change the color of the played part

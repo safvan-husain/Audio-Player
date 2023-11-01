@@ -4,11 +4,12 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 
 //cubit is using due to the need of changing playlist picture.
-class ThemeService extends Cubit<bool> {
+class FastStorage extends Cubit<bool> {
   static final _box = GetStorage();
   static const _key = 'isThemeMode';
+  static const _guideKey = 'isGuideShown';
 
-  ThemeService() : super(_box.read(_key) ?? false);
+  FastStorage() : super(_box.read(_key) ?? false);
 
   ThemeMode get theme => _loadThemeFromBox() ? ThemeMode.dark : ThemeMode.light;
 
@@ -18,5 +19,17 @@ class ThemeService extends Cubit<bool> {
   void switchTheme() {
     Get.changeThemeMode(_loadThemeFromBox() ? ThemeMode.light : ThemeMode.dark);
     _saveThemeToBox(!_loadThemeFromBox());
+  }
+
+  bool get shouldShowGuide => _loadGuideFromBox();
+
+  bool _loadGuideFromBox() => _box.read<bool>(_guideKey) ?? true;
+
+  void showGuide() {
+    _box.write(_guideKey, true);
+  }
+
+  void guideShown() {
+    _box.write(_guideKey, false);
   }
 }

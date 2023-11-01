@@ -52,6 +52,8 @@ dependencies:
   get_storage: ^2.1.1
   audio_service: ^0.18.12
   http:
+  liquid_pull_to_refresh: ^3.0.1
+  showcaseview: ^2.0.3
 
 dev_dependencies:
   flutter_lints: ^2.0.0

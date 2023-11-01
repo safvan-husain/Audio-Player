@@ -17,6 +17,7 @@ import 'package:get_storage/get_storage.dart';
 late AudioPlayerHandler _audioHandler;
 void main() async {
   await GetStorage.init();
+  FastStorage().showGuide();
   WidgetsFlutterBinding.ensureInitialized();
   _audioHandler = await AudioService.init<AudioPlayerHandler>(
     builder: () => AudioPlayerHandler(),
@@ -27,17 +28,19 @@ void main() async {
     ),
   );
   MyDataBase dataBaseService = MyDataBase();
+  late HomeBloc homeBloc;
+  late AudioBloc audioBloc;
   await dataBaseService.init();
-  HomeBloc homeBloc = HomeBloc();
+  homeBloc = HomeBloc();
+  audioBloc = AudioBloc(homeBloc, _audioHandler);
   runApp(
     MultiBlocProvider(
       providers: [
         BlocProvider<HomeBloc>(create: (ctx) => homeBloc),
-        BlocProvider<AudioBloc>(
-            create: (ctx) => AudioBloc(homeBloc, _audioHandler)),
+        BlocProvider<AudioBloc>(create: (ctx) => audioBloc),
         BlocProvider<PlayListWindowBloc>(
             create: (ctx) => PlayListWindowBloc(homeBloc)),
-        BlocProvider<ThemeService>(create: (ctx) => ThemeService()),
+        BlocProvider<FastStorage>(create: (ctx) => FastStorage()),
       ],
       child: const MyApp(),
     ),
@@ -59,7 +62,7 @@ class MyApp extends StatelessWidget {
           theme: MyTheme.light,
           darkTheme: MyTheme.dark,
           home: const HomeView(),
-          themeMode: ThemeService().theme,
+          themeMode: FastStorage().theme,
         );
       },
     );

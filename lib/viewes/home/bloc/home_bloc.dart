@@ -40,11 +40,23 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         //show message that permission would need.
         throw ('Permission denied');
       }
+      List<Future<Track> Function()> l = [];
       for (var track in tracks) {
-        await databaseServices.insertTrack(track);
+        var s = await databaseServices.insertTrack(track, () {
+          if (state.onHome) {
+            add(RenderTracksFromApp());
+          } else {
+            add(RenderPlayList(state.playLists[0]));
+          }
+        });
+        if (s != null) l.add(s);
       }
       await databaseServices.deleteNonExistentTracks(tracks);
       add(RenderTracksFromApp());
+      for (var m in l) {
+        Track track = await m();
+        _replaceTrack(state.trackList, track);
+      }
     });
 
     on<RenderTracksFromApp>((event, emit) async {
@@ -145,4 +157,13 @@ Future<Uint8List?> _extractTrackCoverImage(String trackUrl) async {
     File(trackUrl),
   );
   return metadata.albumArt;
+}
+
+void _replaceTrack(List<Track> trackList, Track newTrack) {
+  for (int i = 0; i < trackList.length; i++) {
+    if (trackList[i].trackName == newTrack.trackName) {
+      trackList[i] = newTrack;
+      break;
+    }
+  }
 }

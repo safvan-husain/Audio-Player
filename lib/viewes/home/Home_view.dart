@@ -1,9 +1,6 @@
 // ignore_for_file: avoid_print
-
-import 'dart:async';
-import 'dart:developer';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:audio_player/common/theme/theme_services.dart';
-import 'package:audio_player/services/audio_download_service.dart';
 import 'package:audio_player/common/track_model.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
 import 'package:audio_player/viewes/home/bloc/home_bloc.dart';
@@ -20,7 +17,6 @@ import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class HomeView extends StatefulWidget {
   const HomeView({super.key});
@@ -32,10 +28,9 @@ class HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   bool isVisible = false;
   bool _isPaused = false;
-  bool _isLauched = false;
+  final bool _isLauched = false;
 
   @override
   void initState() {
@@ -43,18 +38,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     context.read<HomeBloc>().add(RenderTracksFromDevice());
 
     ReceiveSharingIntent.getTextStream().listen((String value) async {
-      Navigator.of(context).push(PopUpRoute(const DownloadDailogue()));
-      AudioDownloadService().fetchData(
-        ytId: value,
-        onMp3Generated: (url) async {
-          _isLauched = true;
-          _launchInBrowser(Uri.parse(url));
-        },
-        onFailure: (message) {
-          Navigator.of(context).pop();
-          throw ('failure to convert');
-        },
-      );
+      Navigator.of(context).push(PopUpRoute(DownloadDailogue(value)));
     }, onError: (err) {
       throw ("getLinkStream error: $err");
     });
@@ -62,17 +46,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     // For sharing or opening urls/text coming from outside the app while the app is closed
     ReceiveSharingIntent.getInitialText().then((String? value) {
       if (value != null) {
-        Navigator.of(context).push(PopUpRoute(const DownloadDailogue()));
-        AudioDownloadService().fetchData(
-          ytId: value,
-          onMp3Generated: (url) async {
-            _isLauched = true;
-            _launchInBrowser(Uri.parse(url));
-          },
-          onFailure: (message) {
-            Navigator.of(context).pop();
-          },
-        );
+        Navigator.of(context).push(PopUpRoute(DownloadDailogue(value)));
       }
     });
     super.initState();
@@ -81,10 +55,6 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      if (_isLauched) {
-        Navigator.of(context).pop();
-        _isLauched = false;
-      }
       if (_isPaused && context.read<HomeBloc>().state.onHome) {
         //checking it was paused or not, because resumed called with init,
         //and only need to refresh home if not in a playlist view.
@@ -96,21 +66,11 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _launchInBrowser(Uri url) async {
-    if (!await launchUrl(
-      url,
-      mode: LaunchMode.externalApplication,
-    )) {
-      throw Exception('Could not launch $url');
-    }
-  }
-
 //build calls when the audio position change
 //attention need, fix.
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: SizedBox(
@@ -121,7 +81,8 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
               Expanded(
                 child: Stack(
                   children: [
-                    RefreshIndicator(
+                    LiquidPullToRefresh(
+                      springAnimationDurationInMilliseconds: 600,
                       onRefresh: () async {
                         if (context.read<HomeBloc>().state.onHome) {
                           context
@@ -129,11 +90,11 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
                               .add(RenderTracksFromDevice());
                         }
                       },
-                      backgroundColor: Theme.of(context).cardColor,
-                      color: Theme.of(context).splashColor,
+                      backgroundColor: Theme.of(context).focusColor,
+                      color: Theme.of(context).scaffoldBackgroundColor,
                       child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(2),
                         physics: const AlwaysScrollableScrollPhysics(),
+                        padding: const EdgeInsets.all(2),
                         child: BlocBuilder<HomeBloc, HomeState>(
                           builder: (context, state) {
                             return switch (state) {
@@ -171,7 +132,9 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
         mainAxisSize: MainAxisSize.min,
         children: [
           PlayListHeader(playListName: playLists[0]),
-          AudioList(tracks: trackList)
+          AudioList(
+            tracks: trackList,
+          )
         ],
       ),
     );
@@ -191,7 +154,9 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
           _ => Column(
               children: [
                 const PlayListView(),
-                AudioList(tracks: state.trackList)
+                AudioList(
+                  tracks: state.trackList,
+                )
               ],
             ),
         },
@@ -208,7 +173,7 @@ class _HomeViewState extends State<HomeView> with WidgetsBindingObserver {
         children: [
           InkWell(
             borderRadius: BorderRadius.circular(30),
-            onTap: () => ThemeService().switchTheme(),
+            onTap: () => FastStorage().switchTheme(),
             child:
                 Icon(context.isDarkMode ? Icons.light_mode : Icons.dark_mode),
           ),

@@ -7,7 +7,9 @@ enum ChangeType {
   end,
   playerState,
   trackLoaded,
-  shuffle
+  shuffle,
+  wave1,
+  wave2
 }
 
 // @immutable

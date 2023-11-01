@@ -1,5 +1,4 @@
-import 'dart:async';
-
+import 'package:audio_player/common/theme/theme_services.dart';
 import 'package:audio_player/common/track_model.dart';
 import 'package:audio_player/viewes/audio/audio_view.dart';
 import 'package:audio_player/viewes/audio/bloc/audio_bloc.dart';
@@ -10,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 class AudioControl extends StatefulWidget {
   const AudioControl({
@@ -23,19 +23,25 @@ class AudioControl extends StatefulWidget {
 class _AudioControlState extends State<AudioControl> {
   bool isVisible = false;
   bool isFavorite = false;
+  final GlobalKey _key = GlobalKey();
   late Track track;
-  late Timer _timer;
+  late FastStorage _fastStorage;
+
   @override
   void initState() {
-    _timer = Timer(const Duration(seconds: 1), () {
-      setState(() => isVisible = true);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fastStorage = FastStorage();
+      if (_fastStorage.shouldShowGuide) {
+        ShowCaseWidget.of(context).startShowCase([_key]);
+        _fastStorage.guideShown();
+      }
     });
+
     super.initState();
   }
 
   @override
   void dispose() {
-    _timer.cancel();
     super.dispose();
   }
 
@@ -46,46 +52,52 @@ class _AudioControlState extends State<AudioControl> {
         .state
         .tracks
         .elementAt(context.read<AudioBloc>().state.currentIndex);
-    return Visibility(
-      visible: isVisible,
-      child: Positioned(
-        bottom: 10,
-        left: 0,
-        right: 0,
-        child: Hero(
-          tag: 'heri',
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (c) => const AudioView()));
-              },
-              onHorizontalDragEnd: (DragEndDetails details) {
-                if (details.velocity.pixelsPerSecond.dx > 0) {
-                  context.read<AudioBloc>().add(AudioEndEvent());
-                }
-              },
-              child: Card(
-                color: Theme.of(context).cardColor,
-                child: Container(
-                  margin: const EdgeInsets.all(5),
-                  width: MediaQuery.of(context).size.width,
-                  height: 50.h,
-                  child: BlocBuilder<AudioBloc, AudioState>(
-                    builder: (context, state) {
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildNameAndButtons(context, state),
-                          const AudioProgress(),
-                        ],
-                      );
-                    },
+    return Positioned(
+      bottom: 10,
+      left: 0,
+      right: 0,
+      child: Hero(
+        tag: 'heri',
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ShowCaseWidget(
+            builder: Builder(builder: (context) {
+              return Showcase(
+                key: _key,
+                description:
+                    'Tap to expand the control\nSwipe right to dispose the player',
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                        MaterialPageRoute(builder: (c) => const AudioView()));
+                  },
+                  onHorizontalDragEnd: (DragEndDetails details) {
+                    if (details.velocity.pixelsPerSecond.dx > 0) {
+                      context.read<AudioBloc>().add(AudioEndEvent());
+                    }
+                  },
+                  child: Card(
+                    color: Theme.of(context).cardColor,
+                    child: Container(
+                      margin: const EdgeInsets.all(5),
+                      width: MediaQuery.of(context).size.width,
+                      height: 50.h,
+                      child: BlocBuilder<AudioBloc, AudioState>(
+                        builder: (context, state) {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _buildNameAndButtons(context, state),
+                              const AudioProgress(),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
+              );
+            }),
           ),
         ),
       ),

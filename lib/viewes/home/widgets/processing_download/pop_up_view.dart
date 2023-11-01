@@ -1,11 +1,49 @@
+import 'package:audio_player/services/audio_download_service.dart';
 import 'package:audio_player/viewes/playlist_pop_up_window/bloc/play_list_window_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class DownloadDailogue extends StatelessWidget {
-  const DownloadDailogue({super.key});
+class DownloadDailogue extends StatefulWidget {
+  final String value;
+  const DownloadDailogue(this.value, {super.key});
+
+  @override
+  State<DownloadDailogue> createState() => _DownloadDailogueState();
+}
+
+class _DownloadDailogueState extends State<DownloadDailogue> {
+  bool isDownloable = false;
+  late String url;
+  @override
+  void initState() {
+    AudioDownloadService().fetchData(
+      ytId: widget.value,
+      onMp3Generated: (uri) async {
+        url = uri;
+        setState(() {
+          isDownloable = true;
+        });
+      },
+      onFailure: (message) {
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Failed to convert!')));
+      },
+    );
+    super.initState();
+  }
+
+  Future<void> _launchInBrowser(String url) async {
+    if (!await launchUrl(
+      Uri.parse(url),
+      mode: LaunchMode.externalApplication,
+    )) {
+      throw Exception('Could not launch $url');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +123,50 @@ class DownloadDailogue extends StatelessWidget {
                           ],
                         ),
                       ],
+                    ),
+                    SizedBox(height: 7.h),
+                    Material(
+                      elevation: isDownloable ? 3 : 0,
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 5.h),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            color: isDownloable
+                                ? Theme.of(context).scaffoldBackgroundColor
+                                : Theme.of(context).cardColor),
+                        child: () {
+                          if (isDownloable) {
+                            return InkWell(
+                              onTap: () async {
+                                setState(() {
+                                  isDownloable = false;
+                                });
+                                await _launchInBrowser(url);
+                                if (context.mounted) {
+                                  Navigator.of(context).pop();
+                                }
+                              },
+                              child: Center(
+                                  child: Text(
+                                'Download from web',
+                                style: GoogleFonts.russoOne(
+                                    color: Theme.of(context).cardColor,
+                                    textStyle: TextStyle(
+                                        overflow: TextOverflow.ellipsis,
+                                        fontSize: 14.r)),
+                              )),
+                            );
+                          }
+                          return SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: Theme.of(context).splashColor,
+                              ));
+                        }(),
+                      ),
                     )
                   ],
                 ),
